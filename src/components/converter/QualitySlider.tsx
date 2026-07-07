@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FiInfo, FiImage, FiVideo, FiMusic } from 'react-icons/fi';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import {
   getQualityConfig,
   getQualityLabel,
@@ -56,6 +57,7 @@ export const QualitySlider: React.FC<QualitySliderProps> = ({
   className,
   label,
 }) => {
+  const { t } = useTranslation();
   const config = getQualityConfig(category);
   const Icon = getCategoryIcon(category);
 
@@ -97,7 +99,7 @@ export const QualitySlider: React.FC<QualitySliderProps> = ({
         <div className="flex items-center gap-2">
           <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {label || '输出质量'}
+            {label || t('converter.quality')}
           </label>
         </div>
         <div className="text-right">
@@ -138,7 +140,7 @@ export const QualitySlider: React.FC<QualitySliderProps> = ({
             'absolute inset-0 w-full h-full opacity-0 cursor-pointer',
             disabled && 'cursor-not-allowed'
           )}
-          aria-label="调整质量"
+          aria-label={t('converter.adjustQuality')}
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuenow={value}
@@ -168,17 +170,17 @@ export const QualitySlider: React.FC<QualitySliderProps> = ({
         <FiInfo className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
           <p className="font-medium mb-1">
-            {category === 'image' && '图片质量'}
-            {category === 'video' && '视频质量 (CRF)'}
-            {category === 'audio' && '音频比特率'}
+            {category === 'image' && t('converter.imageQualityTitle')}
+            {category === 'video' && t('converter.videoQualityTitle')}
+            {category === 'audio' && t('converter.audioBitrateTitle')}
           </p>
           <p>
             {category === 'image' &&
-              '较高的质量会产生更大的文件，但保留更多细节。较低的质量适合网页使用。'}
+              t('converter.imageQualityDesc')}
             {category === 'video' &&
-              'CRF 值越低质量越好。推荐值 23 提供良好的平衡。18-28 是常用范围。'}
+              t('converter.videoQualityDesc')}
             {category === 'audio' &&
-              '较高的比特率提供更好的音质。192 kbps 是大多数用途的良好选择。'}
+              t('converter.audioQualityDesc')}
           </p>
         </div>
       </div>
@@ -191,7 +193,7 @@ export const QualitySlider: React.FC<QualitySliderProps> = ({
           disabled={disabled}
           className="text-xs text-primary hover:text-primary-dark transition-colors disabled:opacity-50"
         >
-          重置为默认 ({category === 'image' && `${Math.round(defaultValue * 100)}%`}
+          {t('converter.resetToDefault')} ({category === 'image' && `${Math.round(defaultValue * 100)}%`}
           {category === 'video' && `CRF ${defaultValue}`}
           {category === 'audio' && `${defaultValue} kbps`})
         </button>

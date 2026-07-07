@@ -14,6 +14,7 @@ import {
   FiCheckCircle,
 } from 'react-icons/fi';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import type { ConversionFile, ConversionResult } from '@/types';
 import { formatFileSize } from '@/utils/constants';
 import { getFormatDisplayName, getFormatIcon } from '@/utils/formatUtils';
@@ -56,6 +57,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
   size = 'md',
   onClick,
 }) => {
+  const { t } = useTranslation();
   // 判断是 ConversionFile 还是 ConversionResult
   const isResult = 'convertedBlob' in file;
   const originalFile = isResult ? file.originalFile : file;
@@ -148,7 +150,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({
           <div className="flex items-center gap-2 mt-1">
             <FiCheckCircle className="w-3 h-3 text-green-500" />
             <span className={clsx('text-green-600 dark:text-green-400', classes.subtitle)}>
-              已转换为 {getFormatDisplayName(resultFile!.outputFormat)}
+              {t('converter.convertedTo')} {getFormatDisplayName(resultFile!.outputFormat)}
             </span>
           </div>
         )}
@@ -188,14 +190,15 @@ export const FilePreviewList: React.FC<FilePreviewListProps> = ({
   files,
   showResults = false,
   className,
-  emptyText = '暂无文件',
+  emptyText,
   onFileClick,
 }) => {
+  const { t } = useTranslation();
   if (files.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         <FiFile className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p>{emptyText}</p>
+        <p>{emptyText || t('converter.noFiles')}</p>
       </div>
     );
   }

@@ -21,6 +21,7 @@ import {
 } from 'react-icons/fi';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 import { useSubscription } from '@/hooks/useSubscription';
 import type { ConversionFile, ConversionResult } from '@/types';
@@ -40,9 +41,11 @@ import {
 type ConversionStatus = 'idle' | 'loading-ffmpeg' | 'converting' | 'completed' | 'error';
 
 export default function AudioConverter() {
+  const { t } = useTranslation();
+
   // 订阅状态
   const { limits, canPerformConversion, validateFileSize, incrementUsage, getValidationError } = useSubscription();
-  
+
   // 本地状态
   const [files, setFiles] = useState<ConversionFile[]>([]);
   const [outputFormat, setOutputFormat] = useState<AudioFormat>('mp3');
@@ -61,11 +64,11 @@ export default function AudioConverter() {
         setFfmpegLoaded(true);
       } catch (err) {
         console.error('Failed to load FFmpeg:', err);
-        toast.error('FFmpeg 加载失败，请刷新页面重试');
+        toast.error(t('errors.ffmpegLoadFailed'));
       }
     };
     loadFFmpeg();
-  }, []);
+  }, [t]);
 
   // 支持的格式
   const supportedFormats = SUPPORTED_AUDIO_FORMATS;
@@ -81,7 +84,7 @@ export default function AudioConverter() {
     const validFiles: ConversionFile[] = [];
     for (const file of acceptedFiles) {
       if (!validateFileSize(file.size)) {
-        toast.error(`${file.name}: 文件大小超过 ${limits.maxFileSizeMB}MB 限制`);
+        toast.error(t('errors.fileTooLarge', { name: file.name, size: limits.maxFileSizeMB }));
         continue;
       }
 
@@ -95,9 +98,9 @@ export default function AudioConverter() {
         'audio/mp4',
         'audio/webm',
       ];
-      
+
       if (!validAudioTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|aac|flac|m4a|wma|weba)$/i)) {
-        toast.error(`${file.name}: 不支持的音频格式`);
+        toast.error(t('audio.unsupportedFormat', { name: file.name }));
         continue;
       }
 
@@ -114,7 +117,7 @@ export default function AudioConverter() {
     setStatus('idle');
     setResults([]);
     setError(null);
-  }, [files.length, limits.maxFileSizeMB, validateFileSize, getValidationError]);
+  }, [files.length, limits.maxFileSizeMB, validateFileSize, getValidationError, t]);
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
     onDrop,
@@ -142,17 +145,17 @@ export default function AudioConverter() {
   // 开始转换
   const startConversion = useCallback(async () => {
     if (files.length === 0) {
-      toast.error('请先选择要转换的音频');
+      toast.error(t('audio.noAudioSelected'));
       return;
     }
 
     if (!canPerformConversion(files.length)) {
-      toast.error('今日转换次数已达上限，请升级订阅计划');
+      toast.error(t('audio.limitReached'));
       return;
     }
 
     if (!ffmpegLoaded) {
-      toast.error('FFmpeg 正在加载中，请稍后再试');
+      toast.error(t('audio.ffmpegLoading'));
       return;
     }
 
@@ -184,14 +187,14 @@ export default function AudioConverter() {
       setResults(conversionResults);
       setStatus('completed');
       incrementUsage();
-      toast.success(`成功转换 ${conversionResults.length} 个音频！`);
+      toast.success(t('audio.audioSuccess', { count: conversionResults.length }));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '转换失败';
+      const errorMessage = err instanceof Error ? err.message : t('errors.conversionFailed');
       setError(errorMessage);
       setStatus('error');
       toast.error(errorMessage);
     }
-  }, [files, outputFormat, quality, canPerformConversion, incrementUsage, ffmpegLoaded]);
+  }, [files, outputFormat, quality, canPerformConversion, incrementUsage, ffmpegLoaded, t]);
 
   // 下载结果
   const downloadResult = useCallback((result: ConversionResult) => {
@@ -203,8 +206,8 @@ export default function AudioConverter() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success('下载已开始');
-  }, []);
+    toast.success(t('errors.downloadStarted'));
+  }, [t]);
 
   // 下载所有
   const downloadAll = useCallback(() => {
@@ -218,10 +221,10 @@ export default function AudioConverter() {
       {/* 页面标题 */}
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          音频格式转换
+          {t('audio.title')}
         </h1>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          支持 MP3、WAV、OGG、AAC、FLAC、M4A 等格式互转。使用 FFmpeg.wasm 在浏览器本地处理，保护您的隐私。
+          {t('audio.subtitle')}
         </p>
       </div>
 
@@ -231,7 +234,7 @@ export default function AudioConverter() {
           <div className="flex items-center gap-3">
             <FiLoader className="w-5 h-5 text-yellow-600 animate-spin" />
             <span className="text-sm text-yellow-800 dark:text-yellow-200">
-              正在加载 FFmpeg 引擎，首次使用可能需要几秒钟...
+              {t('audio.loadingFfmpeg')}
             </span>
           </div>
         </div>
@@ -243,13 +246,13 @@ export default function AudioConverter() {
           <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
             <FiSettings className="w-4 h-4" />
             <span>
-              今日剩余转换次数: <strong>{limits.remainingConversions === Infinity ? '无限制' : limits.remainingConversions}</strong>
+              {t('converter.remaining')}: <strong>{limits.remainingConversions === Infinity ? t('converter.unlimited') : limits.remainingConversions}</strong>
               {' · '}
-              文件大小限制: <strong>{limits.maxFileSizeMB}MB</strong>
+              {t('converter.fileSizeLimit')}: <strong>{limits.maxFileSizeMB}MB</strong>
             </span>
           </div>
           <div className="text-sm text-blue-600 dark:text-blue-300">
-            批量上限: <strong>{limits.batchSize}</strong> 个文件
+            {t('converter.batchLimit')}: <strong>{limits.batchSize}</strong> {t('converter.files')}
           </div>
         </div>
       </div>
@@ -273,16 +276,16 @@ export default function AudioConverter() {
             <FiMic className="w-10 h-10 text-primary" />
           </div>
           <p className="text-xl font-medium text-gray-900 dark:text-white mb-2">
-            {isDragActive ? '释放以上传音频' : '拖拽音频到此处'}
+            {isDragActive ? t('converter.dragActive') : t('converter.dragFile')}
           </p>
           <p className="text-gray-500 dark:text-gray-400 mb-4">
-            或点击选择文件
+            {t('converter.orClick')}
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            支持 MP3, WAV, OGG, AAC, FLAC, M4A, WMA
+            {t('audio.supportedFormats')}
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-            最大 {limits.maxFileSizeMB}MB · 最多 {limits.batchSize} 个文件
+            {t('converter.maxFileSize', { size: limits.maxFileSizeMB })} · {t('converter.maxFiles', { count: limits.batchSize })}
           </p>
         </motion.div>
       )}
@@ -300,14 +303,14 @@ export default function AudioConverter() {
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <FiSettings className="w-5 h-5" />
-                转换设置
+                {t('converter.settings')}
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* 输出格式 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    输出格式
+                    {t('converter.outputFormat')}
                   </label>
                   <select
                     value={outputFormat}
@@ -326,7 +329,7 @@ export default function AudioConverter() {
                 {/* 质量设置 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    音频质量
+                    {t('converter.quality')}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {(['low', 'medium', 'high'] as const).map((q) => (
@@ -341,9 +344,9 @@ export default function AudioConverter() {
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                         )}
                       >
-                        {q === 'low' && '低 (96kbps)'}
-                        {q === 'medium' && '中 (192kbps)'}
-                        {q === 'high' && '高 (320kbps)'}
+                        {q === 'low' && t('converter.audioQualityLow')}
+                        {q === 'medium' && t('converter.audioQualityMedium')}
+                        {q === 'high' && t('converter.audioQualityHigh')}
                       </button>
                     ))}
                   </div>
@@ -353,7 +356,7 @@ export default function AudioConverter() {
               {/* 提示信息 */}
               <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  音频转换速度较快，取决于文件大小。转换过程中请勿关闭页面。
+                  {t('converter.audioWarning')}
                 </p>
               </div>
             </div>
@@ -362,7 +365,7 @@ export default function AudioConverter() {
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 className="font-semibold text-gray-900 dark:text-white">
-                  已选择 {files.length} 个文件
+                  {t('converter.filesSelected')} {files.length} {t('converter.files')}
                 </h3>
                 <Button
                   variant="ghost"
@@ -372,10 +375,10 @@ export default function AudioConverter() {
                   className="text-red-500 hover:text-red-600"
                 >
                   <FiTrash2 className="w-4 h-4 mr-1" />
-                  清空
+                  {t('converter.clear')}
                 </Button>
               </div>
-              
+
               <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto">
                 {files.map((file, index) => (
                   <motion.div
@@ -419,7 +422,7 @@ export default function AudioConverter() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <FiLoader className="w-6 h-6 text-primary animate-spin" />
-                  <span className="font-medium text-gray-900 dark:text-white">正在转换音频...</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{t('converter.converting')}</span>
                 </div>
                 <Progress value={progress} size="lg" showLabel />
               </motion.div>
@@ -435,7 +438,7 @@ export default function AudioConverter() {
                 <div className="flex items-center gap-3">
                   <FiAlertCircle className="w-6 h-6 text-red-500" />
                   <div>
-                    <p className="font-medium text-red-800 dark:text-red-200">转换失败</p>
+                    <p className="font-medium text-red-800 dark:text-red-200">{t('converter.conversionFailed')}</p>
                     <p className="text-sm text-red-600 dark:text-red-300">{error}</p>
                   </div>
                 </div>
@@ -455,10 +458,10 @@ export default function AudioConverter() {
                   </div>
                   <div>
                     <p className="font-semibold text-green-800 dark:text-green-200">
-                      转换完成！
+                      {t('converter.completed')}
                     </p>
                     <p className="text-sm text-green-600 dark:text-green-300">
-                      成功转换 {results.length} 个音频
+                      {t('audio.audioSuccess', { count: results.length })}
                     </p>
                   </div>
                 </div>
@@ -486,7 +489,7 @@ export default function AudioConverter() {
                         onClick={() => downloadResult(result)}
                       >
                         <FiDownload className="w-4 h-4 mr-1" />
-                        下载
+                        {t('converter.download')}
                       </Button>
                     </div>
                   ))}
@@ -496,7 +499,7 @@ export default function AudioConverter() {
                 {results.length > 1 && (
                   <Button onClick={downloadAll} className="w-full">
                     <FiDownload className="w-4 h-4 mr-2" />
-                    下载所有文件
+                    {t('converter.downloadAll')}
                   </Button>
                 )}
               </motion.div>
@@ -521,7 +524,7 @@ export default function AudioConverter() {
                 disabled={status === 'converting' || files.length >= limits.batchSize}
               >
                 <FiUpload className="w-4 h-4 mr-2" />
-                添加更多
+                {t('converter.addMore')}
               </Button>
               <Button
                 className="flex-1"
@@ -531,12 +534,12 @@ export default function AudioConverter() {
                 {status === 'converting' ? (
                   <>
                     <FiLoader className="w-4 h-4 mr-2 animate-spin" />
-                    转换中...
+                    {t('converter.converting')}
                   </>
                 ) : (
                   <>
                     <FiPlay className="w-4 h-4 mr-2" />
-                    开始转换
+                    {t('converter.startConversion')}
                   </>
                 )}
               </Button>
@@ -555,7 +558,7 @@ export default function AudioConverter() {
           <div className="flex items-start gap-3">
             <FiAlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-red-800 dark:text-red-200">部分文件无法上传</p>
+              <p className="font-medium text-red-800 dark:text-red-200">{t('converter.someFilesRejected')}</p>
               <ul className="mt-1 text-sm text-red-600 dark:text-red-300">
                 {fileRejections.map(({ file, errors }, index) => (
                   <li key={index}>

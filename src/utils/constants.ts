@@ -116,10 +116,10 @@ export const QUALITY_OPTIONS = {
     step: 0.1,
     default: 0.8,
     labels: {
-      low: '低质量 (小文件)',
-      medium: '中等质量',
-      high: '高质量',
-      maximum: '最高质量 (大文件)',
+      low: 'Low (small file)',
+      medium: 'Medium',
+      high: 'High',
+      maximum: 'Maximum (large file)',
     },
   },
   video: {
@@ -128,10 +128,10 @@ export const QUALITY_OPTIONS = {
     step: 1,
     default: 23, // CRF value for ffmpeg (lower is better quality)
     labels: {
-      low: '低质量 (小文件)',
-      medium: '中等质量',
-      high: '高质量',
-      maximum: '无损质量 (大文件)',
+      low: 'Low (small file)',
+      medium: 'Medium',
+      high: 'High',
+      maximum: 'Lossless (large file)',
     },
   },
   audio: {
@@ -151,36 +151,36 @@ export const QUALITY_OPTIONS = {
 // ==================== 错误消息 ====================
 export const ERROR_MESSAGES = {
   // 文件相关错误
-  FILE_TOO_LARGE: (maxSizeMB: number) => `文件大小超过限制。最大允许 ${maxSizeMB}MB`,
-  FILE_TYPE_NOT_SUPPORTED: '不支持的文件类型',
-  FILE_READ_ERROR: '文件读取失败，请重试',
-  FILE_CORRUPTED: '文件可能已损坏',
+  FILE_TOO_LARGE: (maxSizeMB: number) => `File size exceeds limit. Maximum allowed: ${maxSizeMB}MB`,
+  FILE_TYPE_NOT_SUPPORTED: 'Unsupported file type',
+  FILE_READ_ERROR: 'File read failed, please try again',
+  FILE_CORRUPTED: 'File may be corrupted',
   
   // 订阅限制错误
-  DAILY_LIMIT_REACHED: '今日转换次数已达上限，请升级订阅计划',
-  UPGRADE_REQUIRED: '此功能需要升级订阅',
+  DAILY_LIMIT_REACHED: 'Daily conversion limit reached. Please upgrade your subscription plan',
+  UPGRADE_REQUIRED: 'This feature requires a subscription upgrade',
   
   // 转换错误
-  CONVERSION_FAILED: '转换失败，请重试',
-  CONVERSION_TIMEOUT: '转换超时，请尝试较小的文件',
-  UNSUPPORTED_CONVERSION: '不支持的格式转换',
+  CONVERSION_FAILED: 'Conversion failed, please try again',
+  CONVERSION_TIMEOUT: 'Conversion timed out, please try a smaller file',
+  UNSUPPORTED_CONVERSION: 'Unsupported format conversion',
   
   // 网络/服务器错误
-  NETWORK_ERROR: '网络错误，请检查连接',
-  SERVER_ERROR: '服务器错误，请稍后重试',
+  NETWORK_ERROR: 'Network error, please check your connection',
+  SERVER_ERROR: 'Server error, please try again later',
   
   // 通用错误
-  UNKNOWN_ERROR: '发生未知错误，请重试',
-  INVALID_INPUT: '输入无效，请检查',
+  UNKNOWN_ERROR: 'An unknown error occurred, please try again',
+  INVALID_INPUT: 'Invalid input, please check',
 } as const;
 
 // ==================== 成功消息 ====================
 export const SUCCESS_MESSAGES = {
-  CONVERSION_COMPLETE: '转换完成！',
-  FILE_UPLOADED: '文件上传成功',
-  FILE_REMOVED: '文件已移除',
-  DOWNLOAD_STARTED: '下载已开始',
-  SETTINGS_SAVED: '设置已保存',
+  CONVERSION_COMPLETE: 'Conversion complete!',
+  FILE_UPLOADED: 'File uploaded successfully',
+  FILE_REMOVED: 'File removed',
+  DOWNLOAD_STARTED: 'Download started',
+  SETTINGS_SAVED: 'Settings saved',
 } as const;
 
 // ==================== 本地存储键名 ====================
@@ -262,7 +262,7 @@ export const formatFileSize = (bytes: number): string => {
 
 // ==================== 格式化工具函数 ====================
 export const formatDuration = (seconds: number): string => {
-  if (seconds < 60) return `${Math.round(seconds)}秒`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}分${Math.round(seconds % 60)}秒`;
-  return `${Math.floor(seconds / 3600)}时${Math.floor((seconds % 3600) / 60)}分`;
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`;
+  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
 };

@@ -5,9 +5,10 @@
 
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
-import { SUBSCRIPTION_PLANS } from '@/types';
+import { SUBSCRIPTION_PLANS, getYearlyPrice } from '@/types';
 import type { SubscriptionPlan } from '@/types';
 import { FiCheck, FiX, FiZap, FiStar, FiBriefcase } from 'react-icons/fi';
 
@@ -22,6 +23,8 @@ export interface PricingCardProps {
   isLoading?: boolean;
   /** Highlight as recommended plan */
   isRecommended?: boolean;
+  /** Billing interval */
+  billingInterval?: 'monthly' | 'yearly';
 }
 
 /**
@@ -34,8 +37,11 @@ export function PricingCard({
   onSelect,
   isLoading = false,
   isRecommended = false,
+  billingInterval = 'monthly',
 }: PricingCardProps) {
+  const { t } = useTranslation();
   const isFree = plan.price === 0;
+  const isYearly = billingInterval === 'yearly';
 
   // Get icon based on plan
   const PlanIcon = {
@@ -47,30 +53,30 @@ export function PricingCard({
   // Feature list with availability
   const features = [
     {
-      label: '每日转换次数',
-      value: plan.features.dailyConversions === -1 ? '无限制' : `${plan.features.dailyConversions} 次`,
+      label: t('pricing.dailyConversions'),
+      value: plan.features.dailyConversions === -1 ? t('pricing.unlimited') : `${plan.features.dailyConversions} ${t('pricing.times')}`,
       available: true,
     },
     {
-      label: '最大文件大小',
+      label: t('pricing.maxFileSize'),
       value: `${plan.features.maxFileSize / (1024 * 1024)}MB`,
       available: true,
     },
     {
-      label: '批量转换',
-      value: `${plan.features.batchSize} 个文件`,
+      label: t('pricing.batchConversion'),
+      value: `${plan.features.batchSize} ${t('converter.files')}`,
       available: plan.features.batchSize > 1,
     },
     {
-      label: '无广告体验',
+      label: t('pricing.noAds'),
       available: plan.features.noAds,
     },
     {
-      label: '优先客服支持',
+      label: t('pricing.prioritySupport'),
       available: plan.id !== 'free',
     },
     {
-      label: 'API 访问',
+      label: t('pricing.apiAccess'),
       available: plan.id === 'enterprise',
     },
   ];
@@ -87,7 +93,7 @@ export function PricingCard({
       {/* Recommended badge */}
       {isRecommended && (
         <div className="absolute top-0 right-0 bg-primary text-white text-xs font-semibold px-4 py-1 rounded-bl-lg">
-          推荐
+          {t('pricing.recommended')}
         </div>
       )}
 
@@ -115,7 +121,7 @@ export function PricingCard({
             <div>
               <CardTitle className="text-xl">{plan.name}</CardTitle>
               <CardDescription>
-                {isFree ? '开始使用' : '专业功能'}
+                {isFree ? t('pricing.freeDesc') : t('pricing.proDesc')}
               </CardDescription>
             </div>
           </div>
@@ -123,12 +129,19 @@ export function PricingCard({
           {/* Price */}
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-bold text-gray-900 dark:text-white">
-              ${plan.price}
+              ${isYearly ? getYearlyPrice(plan.price) : plan.price}
             </span>
             {!isFree && (
-              <span className="text-gray-500 dark:text-gray-400">/月</span>
+              <span className="text-gray-500 dark:text-gray-400">
+                {isYearly ? t('pricing.perYear') : t('pricing.perMonth')}
+              </span>
             )}
           </div>
+          {isYearly && !isFree && (
+            <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+              约 ${(getYearlyPrice(plan.price) / 12).toFixed(2)}{t('pricing.perMonth')}，{t('pricing.save', { percent: 17 })}
+            </p>
+          )}
         </CardHeader>
 
         <CardContent className="flex-grow">
@@ -168,7 +181,7 @@ export function PricingCard({
               disabled
               leftIcon={<FiCheck />}
             >
-              当前计划
+              {t('pricing.currentPlan')}
             </Button>
           ) : (
             <Button
@@ -178,7 +191,7 @@ export function PricingCard({
               loading={isLoading}
               leftIcon={isFree ? <FiStar /> : <FiZap />}
             >
-              {isFree ? '免费开始' : '立即升级'}
+              {isFree ? t('pricing.startFree') : t('pricing.upgradeNow')}
             </Button>
           )}
         </CardFooter>

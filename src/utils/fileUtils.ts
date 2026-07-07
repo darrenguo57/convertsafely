@@ -20,7 +20,7 @@ export const readFileAsDataURL = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('文件读取失败'));
+    reader.onerror = () => reject(new Error('File read failed'));
     reader.readAsDataURL(file);
   });
 };
@@ -32,7 +32,7 @@ export const readFileAsArrayBuffer = (file: File): Promise<ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as ArrayBuffer);
-    reader.onerror = () => reject(new Error('文件读取失败'));
+    reader.onerror = () => reject(new Error('File read failed'));
     reader.readAsArrayBuffer(file);
   });
 };
@@ -44,7 +44,7 @@ export const readFileAsText = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('文件读取失败'));
+    reader.onerror = () => reject(new Error('File read failed'));
     reader.readAsText(file);
   });
 };
@@ -164,7 +164,7 @@ export const validateFiles = async (
   for (const file of files) {
     // 检查文件数量限制
     if (options.maxFiles && result.valid.length >= options.maxFiles) {
-      result.errors.push({ file, reason: `最多只能上传 ${options.maxFiles} 个文件` });
+      result.errors.push({ file, reason: `Maximum ${options.maxFiles} files allowed` });
       continue;
     }
 
@@ -172,14 +172,14 @@ export const validateFiles = async (
     if (!isFileSizeValid(file, options.maxSizeBytes)) {
       result.errors.push({
         file,
-        reason: `文件大小超过限制 (${formatFileSize(options.maxSizeBytes)})`,
+        reason: `File size exceeds limit (${formatFileSize(options.maxSizeBytes)})`,
       });
       continue;
     }
 
     // 检查文件类型
     if (!isFileTypeSupported(file, options.category)) {
-      result.errors.push({ file, reason: '不支持的文件类型' });
+      result.errors.push({ file, reason: 'Unsupported file type' });
       continue;
     }
 
@@ -249,7 +249,7 @@ export const getImageDimensions = (
     
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error('无法读取图片尺寸'));
+      reject(new Error('Unable to read image dimensions'));
     };
     
     img.src = url;

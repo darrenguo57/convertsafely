@@ -4,6 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   FiShield,
   FiLock,
@@ -106,6 +107,7 @@ const values = [
 ];
 
 export default function About() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero Section */}

@@ -8,6 +8,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiChrome, FiUser } from 'react-icons/fi';
+import { useTranslation, Trans } from 'react-i18next';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
@@ -23,6 +24,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { register, loginWithGoogle, isAuthenticated, isLoading: authLoading, error, clearError } = useAuth();
+  const { t } = useTranslation();
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,32 +54,27 @@ export default function Signup() {
 
   const validateForm = (): boolean => {
     if (!displayName.trim()) {
-      toast.error('请输入您的姓名');
+      toast.error(t('auth.enterName'));
       return false;
     }
 
-    if (!email.trim()) {
-      toast.error('请输入邮箱地址');
-      return false;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error('请输入有效的邮箱地址');
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error(t('auth.enterEmail'));
       return false;
     }
 
     if (password.length < 6) {
-      toast.error('密码至少需要 6 个字符');
+      toast.error(t('auth.passwordMin'));
       return false;
     }
 
     if (password !== confirmPassword) {
-      toast.error('两次输入的密码不一致');
+      toast.error(t('auth.passwordMismatch'));
       return false;
     }
 
     if (!agreedToTerms) {
-      toast.error('请同意服务条款和隐私政策');
+      toast.error(t('auth.agreeRequired'));
       return false;
     }
 
@@ -93,7 +90,7 @@ export default function Signup() {
     try {
       await register(email, password, displayName);
       trackEvent('sign_up', { method: 'email' });
-      toast.success('注册成功！欢迎加入 ConvertSafely');
+      toast.success(t('auth.accountCreated'));
       navigate(redirectTo);
     } catch (error) {
       // Error is handled by useAuth hook
@@ -109,7 +106,7 @@ export default function Signup() {
       try {
         await signInWithGoogle();
         trackEvent('sign_up', { method: 'google' });
-        toast.success('Google 注册成功！');
+        toast.success(t('auth.googleSignUpSuccess'));
         navigate(redirectTo);
         return;
       } catch (firebaseError) {
@@ -119,10 +116,10 @@ export default function Signup() {
 
       await loginWithGoogle();
       trackEvent('sign_up', { method: 'google' });
-      toast.success('Google 注册成功！');
+      toast.success(t('auth.googleSignUpSuccess'));
       navigate(redirectTo);
     } catch (error) {
-      toast.error('Google 注册失败，请重试');
+      toast.error(t('auth.googleSignUpFailed'));
     } finally {
       setIsGoogleLoading(false);
     }
@@ -150,9 +147,9 @@ export default function Signup() {
 
         <Card padding="lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">创建账户</CardTitle>
+            <CardTitle className="text-2xl">{t('auth.createAccount')}</CardTitle>
             <CardDescription>
-              开始您的安全文件转换之旅
+              {t('auth.signupSubtitle')}
             </CardDescription>
           </CardHeader>
 
@@ -167,7 +164,7 @@ export default function Signup() {
               leftIcon={<FiChrome className="w-5 h-5 text-red-500" />}
               className="mb-4"
             >
-              使用 Google 注册
+              {t('auth.googleSignIn')}
             </Button>
 
             {/* Divider */}
@@ -177,7 +174,7 @@ export default function Signup() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                  或使用邮箱注册
+                  {t('auth.orSignUpWithEmail')}
                 </span>
               </div>
             </div>
@@ -186,7 +183,7 @@ export default function Signup() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  姓名
+                  {t('auth.name')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -197,7 +194,7 @@ export default function Signup() {
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="您的姓名"
+                    placeholder={t('auth.namePlaceholder')}
                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                     required
                   />
@@ -206,7 +203,7 @@ export default function Signup() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  邮箱地址
+                  {t('auth.email')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -226,7 +223,7 @@ export default function Signup() {
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  密码
+                  {t('auth.password')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -237,7 +234,7 @@ export default function Signup() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="至少 6 个字符"
+                    placeholder={t('auth.passwordMinCharsPlaceholder')}
                     className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                     required
                     minLength={6}
@@ -254,7 +251,7 @@ export default function Signup() {
 
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  确认密码
+                  {t('auth.confirmPassword')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -265,7 +262,7 @@ export default function Signup() {
                     type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="再次输入密码"
+                    placeholder={t('auth.confirmPasswordPlaceholder')}
                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                     required
                   />
@@ -285,14 +282,13 @@ export default function Signup() {
                 </div>
                 <div className="ml-3 text-sm">
                   <label htmlFor="terms" className="text-gray-600 dark:text-gray-400">
-                    我同意{' '}
-                    <Link to="/terms" className="text-primary hover:text-primary-dark">
-                      服务条款
-                    </Link>
-                    {' '}和{' '}
-                    <Link to="/privacy" className="text-primary hover:text-primary-dark">
-                      隐私政策
-                    </Link>
+                    <Trans
+                      i18nKey="auth.agreeTerms"
+                      components={{
+                        terms: <Link to="/terms" className="text-primary hover:text-primary-dark" />,
+                        privacy: <Link to="/privacy" className="text-primary hover:text-primary-dark" />,
+                      }}
+                    />
                   </label>
                 </div>
               </div>
@@ -305,18 +301,18 @@ export default function Signup() {
                 disabled={isGoogleLoading}
                 rightIcon={<FiArrowRight className="w-4 h-4" />}
               >
-                创建账户
+                {t('auth.createAccount')}
               </Button>
             </form>
 
             {/* Login Link */}
             <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-              已有账户？{' '}
+              {t('auth.hasAccount')}{' '}
               <Link
                 to={`/login${redirectTo !== '/' ? `?redirect=${redirectTo}` : ''}`}
                 className="font-medium text-primary hover:text-primary-dark"
               >
-                立即登录
+                {t('auth.signInNow')}
               </Link>
             </p>
           </CardContent>
@@ -328,7 +324,7 @@ export default function Signup() {
             to="/"
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           >
-            ← 返回首页
+            {t('auth.backToHome')}
           </Link>
         </p>
       </motion.div>

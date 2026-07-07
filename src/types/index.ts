@@ -38,13 +38,20 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 4.99,
+    price: 5.99,
     features: { maxFileSize: 10 * 1024 * 1024, dailyConversions: 20, noAds: true, batchSize: 10 },
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: 9.99,
+    price: 12.99,
     features: { maxFileSize: 500 * 1024 * 1024, dailyConversions: -1, noAds: true, batchSize: 100 },
   },
 ];
+
+export const YEARLY_DISCOUNT = 0.17; // 17% discount for yearly billing
+
+export function getYearlyPrice(monthlyPrice: number): number {
+  if (monthlyPrice === 0) return 0;
+  return Math.round(monthlyPrice * 12 * (1 - YEARLY_DISCOUNT) * 100) / 100;
+}

@@ -290,7 +290,7 @@ export function useConversion(options: UseConversionOptions = {}) {
   const cancel = useCallback(() => {
     abortControllerRef.current?.abort();
     setStatus('idle');
-    toast('转换已取消', { icon: '⚠️' });
+    toast('Conversion cancelled', { icon: '⚠️' });
   }, []);
 
   /**
@@ -308,7 +308,7 @@ export function useConversion(options: UseConversionOptions = {}) {
     results.forEach((result) => {
       downloadFile(result.convertedBlob, result.outputName);
     });
-    toast.success(`已开始下载 ${results.length} 个文件`);
+    toast.success(`Started downloading ${results.length} files`);
   }, [results]);
 
   /**

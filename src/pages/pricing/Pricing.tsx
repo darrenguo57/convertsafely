@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { FiCheck, FiShield, FiZap, FiStar, FiBriefcase } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/Button';
 import { PricingCard } from '@/components/subscription/PricingCard';
@@ -29,6 +30,7 @@ export default function Pricing() {
   const [searchParams] = useSearchParams();
   const { plan: currentPlan, setPlan } = useSubscription();
   const { isAuthenticated, user } = useAuth();
+  const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -44,10 +46,10 @@ export default function Pricing() {
     if (success === 'true' && plan) {
       handleSuccessfulPayment(plan);
     } else if (canceled === 'true') {
-      toast.error('支付已取消', { duration: 3000 });
+      toast.error(t('pricing.paymentCanceled'), { duration: 3000 });
       trackSubscriptionFunnel('checkout_cancel');
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const handleSuccessfulPayment = async (planId: 'pro' | 'enterprise') => {
     try {
@@ -59,12 +61,12 @@ export default function Pricing() {
         const newPlan = SUBSCRIPTION_PLANS.find((p) => p.id === planId);
         if (newPlan) {
           setPlan(newPlan);
-          toast.success(`成功升级到 ${newPlan.name} 计划！`, { duration: 5000 });
+          toast.success(t('pricing.upgradeSuccess', { plan: newPlan.name }), { duration: 5000 });
           trackSubscriptionFunnel('checkout_complete', planId);
         }
       }
     } catch (error) {
-      toast.error('处理支付结果时出错');
+      toast.error(t('pricing.paymentError'));
       console.error('Payment success handling error:', error);
     } finally {
       setIsLoading(false);
@@ -79,7 +81,7 @@ export default function Pricing() {
     // Free plan - just update
     if (plan.price === 0) {
       setPlan(plan);
-      toast.success('已切换到 Free 计划');
+      toast.success(t('pricing.switchSuccess'));
       return;
     }
 
@@ -116,7 +118,7 @@ export default function Pricing() {
         }
       }
     } catch (error) {
-      toast.error('启动支付流程失败，请重试');
+      toast.error(t('pricing.checkoutFailed'));
       console.error('Checkout error:', error);
     } finally {
       setIsLoading(false);
@@ -165,13 +167,13 @@ export default function Pricing() {
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 dark:bg-primary/20 text-primary text-sm font-medium mb-6">
               <FiZap className="w-4 h-4" />
-              简单透明的定价
+              {t('pricing.badge')}
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              选择适合您的计划
+              {t('pricing.title')}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              从免费开始，随时升级以解锁更多功能。所有计划都包含核心转换功能。
+              {t('pricing.subtitle')}
             </p>
           </motion.div>
 
@@ -190,7 +192,7 @@ export default function Pricing() {
                   : 'text-gray-500 dark:text-gray-400'
               )}
             >
-              月付
+              {t('pricing.monthly')}
             </span>
             <button
               onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
@@ -214,8 +216,8 @@ export default function Pricing() {
                   : 'text-gray-500 dark:text-gray-400'
               )}
             >
-              年付
-              <span className="ml-1 text-xs text-green-600 dark:text-green-400">省20%</span>
+              {t('pricing.yearly')}
+              <span className="ml-1 text-xs text-green-600 dark:text-green-400">{t('pricing.save', { percent: 17 })}</span>
             </span>
           </motion.div>
         </div>
@@ -233,14 +235,12 @@ export default function Pricing() {
             {SUBSCRIPTION_PLANS.map((plan, index) => (
               <motion.div key={plan.id} variants={itemVariants}>
                 <PricingCard
-                  plan={{
-                    ...plan,
-                    price: billingInterval === 'yearly' ? plan.price * 0.8 * 12 : plan.price,
-                  }}
+                  plan={plan}
                   isCurrentPlan={currentPlan.id === plan.id}
                   isRecommended={plan.id === 'pro'}
                   onSelect={handleSelectPlan}
                   isLoading={isLoading}
+                  billingInterval={billingInterval}
                 />
               </motion.div>
             ))}
@@ -260,10 +260,10 @@ export default function Pricing() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              功能对比
+              {t('pricing.featureComparison')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              详细比较各计划的功能和限制
+              {t('pricing.compareDesc')}
             </p>
           </div>
 
@@ -272,7 +272,7 @@ export default function Pricing() {
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
                   <th className="text-left py-4 px-4 font-medium text-gray-900 dark:text-white">
-                    功能
+                    {t('pricing.feature')}
                   </th>
                   {SUBSCRIPTION_PLANS.map((plan) => (
                     <th
@@ -290,7 +290,7 @@ export default function Pricing() {
                         {plan.id === 'enterprise' && <FiBriefcase className="w-5 h-5" />}
                         {plan.name}
                         {currentPlan.id === plan.id && (
-                          <span className="text-xs font-normal text-primary">当前</span>
+                          <span className="text-xs font-normal text-primary">{t('pricing.current')}</span>
                         )}
                       </div>
                     </th>
@@ -299,12 +299,12 @@ export default function Pricing() {
               </thead>
               <tbody>
                 {[
-                  { label: '每日转换次数', key: 'dailyConversions', format: (v: number) => v === -1 ? '无限制' : `${v} 次` },
-                  { label: '最大文件大小', key: 'maxFileSize', format: (v: number) => `${v / (1024 * 1024)}MB` },
-                  { label: '批量转换', key: 'batchSize', format: (v: number) => `${v} 个文件` },
-                  { label: '无广告体验', key: 'noAds', format: (v: boolean) => v ? '✓' : '—' },
-                  { label: '优先客服支持', key: 'support', format: (_v: unknown, plan: typeof SUBSCRIPTION_PLANS[0]) => plan.id !== 'free' ? '✓' : '—' },
-                  { label: 'API 访问', key: 'api', format: (_v: unknown, plan: typeof SUBSCRIPTION_PLANS[0]) => plan.id === 'enterprise' ? '✓' : '—' },
+                  { label: t('pricing.dailyConversions'), key: 'dailyConversions', format: (v: number) => v === -1 ? t('pricing.unlimited') : `${v} ${t('pricing.times')}` },
+                  { label: t('pricing.maxFileSize'), key: 'maxFileSize', format: (v: number) => `${v / (1024 * 1024)}MB` },
+                  { label: t('pricing.batchConversion'), key: 'batchSize', format: (v: number) => `${v} ${t('converter.files')}` },
+                  { label: t('pricing.noAds'), key: 'noAds', format: (v: boolean) => v ? '✓' : '—' },
+                  { label: t('pricing.prioritySupport'), key: 'support', format: (_v: unknown, plan: typeof SUBSCRIPTION_PLANS[0]) => plan.id !== 'free' ? '✓' : '—' },
+                  { label: t('pricing.apiAccess'), key: 'api', format: (_v: unknown, plan: typeof SUBSCRIPTION_PLANS[0]) => plan.id === 'enterprise' ? '✓' : '—' },
                 ].map((feature, index) => (
                   <tr
                     key={feature.key}
@@ -356,10 +356,10 @@ export default function Pricing() {
                 <FiShield className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                安全支付
+                {t('pricing.securePayment')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                256位 SSL 加密，Stripe 安全支付
+                {t('pricing.securePaymentDesc')}
               </p>
             </div>
             <div>
@@ -367,10 +367,10 @@ export default function Pricing() {
                 <FiCheck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                随时取消
+                {t('pricing.cancelAnytime')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                无长期合约，随时可取消订阅
+                {t('pricing.cancelAnytimeDesc')}
               </p>
             </div>
             <div>
@@ -378,10 +378,10 @@ export default function Pricing() {
                 <FiZap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                即时生效
+                {t('pricing.instantAccess')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                升级后立即解锁所有功能
+                {t('pricing.instantAccessDesc')}
               </p>
             </div>
           </div>
@@ -392,25 +392,25 @@ export default function Pricing() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">
-            常见问题
+            {t('pricing.faq')}
           </h2>
           <div className="space-y-4">
             {[
               {
-                q: '我可以随时更改计划吗？',
-                a: '是的，您可以随时升级或降级您的计划。升级立即生效，降级将在当前计费周期结束后生效。',
+                q: t('pricing.faq1q'),
+                a: t('pricing.faq1a'),
               },
               {
-                q: '免费计划有什么限制？',
-                a: '免费计划每天限制 3 次转换，最大文件大小 2MB，并会显示广告。这足以满足偶尔的使用需求。',
+                q: t('pricing.faq2q'),
+                a: t('pricing.faq2a'),
               },
               {
-                q: '我的文件安全吗？',
-                a: '绝对安全。所有文件转换都在您的浏览器本地完成，文件不会上传到我们的服务器。',
+                q: t('pricing.faq3q'),
+                a: t('pricing.faq3a'),
               },
               {
-                q: '如何取消订阅？',
-                a: '您可以随时在账户设置中取消订阅，或联系我们的客服团队。取消后，您仍可使用服务直到当前计费周期结束。',
+                q: t('pricing.faq4q'),
+                a: t('pricing.faq4a'),
               },
             ].map((faq, index) => (
               <div
@@ -434,7 +434,7 @@ export default function Pricing() {
         onUpgrade={handleUpgradeFromModal}
         currentPlan="free"
         reason="feature"
-        message="请先登录或注册账户以完成升级"
+        message={t('pricing.loginToUpgrade')}
       />
     </div>
   );

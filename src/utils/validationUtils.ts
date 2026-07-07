@@ -73,7 +73,7 @@ export const checkBatchSizeLimit = (
   if (fileCount > maxBatchSize) {
     return {
       valid: false,
-      error: `批量转换最多支持 ${maxBatchSize} 个文件，请升级订阅计划`,
+      error: `Batch conversion supports up to ${maxBatchSize} files. Please upgrade your subscription plan`,
       code: 'BATCH_SIZE_EXCEEDED',
     };
   }
@@ -139,28 +139,28 @@ export const validatePasswordStrength = (
   if (password.length >= 8) {
     score++;
   } else {
-    feedback.push('密码至少需要8个字符');
+    feedback.push('Password must be at least 8 characters');
   }
   
   // 包含大写字母
   if (/[A-Z]/.test(password)) {
     score++;
   } else {
-    feedback.push('密码需要包含大写字母');
+    feedback.push('Password must contain uppercase letters');
   }
   
   // 包含小写字母
   if (/[a-z]/.test(password)) {
     score++;
   } else {
-    feedback.push('密码需要包含小写字母');
+    feedback.push('Password must contain lowercase letters');
   }
   
   // 包含数字或特殊字符
   if (/[0-9!@#$%^&*]/.test(password)) {
     score++;
   } else {
-    feedback.push('密码需要包含数字或特殊字符');
+    feedback.push('Password must contain numbers or special characters');
   }
   
   return { score, feedback };
@@ -196,7 +196,7 @@ export const validateConversionParams = (params: {
   if (params.inputFormat === params.outputFormat) {
     return {
       valid: false,
-      error: '输入和输出格式不能相同',
+      error: 'Input and output formats cannot be the same',
       code: 'SAME_FORMAT',
     };
   }
@@ -206,7 +206,7 @@ export const validateConversionParams = (params: {
     if (params.quality < 0 || params.quality > 100) {
       return {
         valid: false,
-        error: '质量参数必须在 0-100 之间',
+        error: 'Quality parameter must be between 0-100',
         code: 'INVALID_QUALITY',
       };
     }
@@ -244,11 +244,11 @@ export const validateConversion = (
     if (!sizeCheck.valid) return sizeCheck;
   }
   
-  // 4. 检查输出格式
+  // 检查输出格式
   if (!outputFormat) {
     return {
       valid: false,
-      error: '请选择输出格式',
+      error: 'Please select an output format',
       code: 'NO_OUTPUT_FORMAT',
     };
   }
@@ -261,7 +261,7 @@ export const validateConversion = (
  */
 export const formatValidationError = (result: ValidationResult): string => {
   if (result.valid) return '';
-  return result.error || '验证失败';
+  return result.error || 'Validation failed';
 };
 
 /**
@@ -269,10 +269,10 @@ export const formatValidationError = (result: ValidationResult): string => {
  */
 export const getUpgradeMessage = (plan: SubscriptionPlan): string => {
   if (plan.id === 'free') {
-    return '升级到 Pro 以获得更多转换次数和更大文件支持';
+    return 'Upgrade to Pro for more conversions and larger file support';
   }
   if (plan.id === 'pro') {
-    return '升级到 Enterprise 以获得无限制转换';
+    return 'Upgrade to Enterprise for unlimited conversions';
   }
   return '';
 };

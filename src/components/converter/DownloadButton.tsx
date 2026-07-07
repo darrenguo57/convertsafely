@@ -14,6 +14,7 @@ import {
   FiTrash2,
 } from 'react-icons/fi';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import type { ConversionResult } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { formatFileSize } from '@/utils/constants';
@@ -46,6 +47,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
   className,
   variant = 'default',
 }) => {
+  const { t } = useTranslation();
   const [showList, setShowList] = useState(false);
   const [downloadedIds, setDownloadedIds] = useState<Set<string>>(new Set());
 
@@ -75,7 +77,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
         onClick={handleDownloadAll}
         className={className}
       >
-        下载全部 ({results.length})
+        {t('converter.downloadAll')} ({results.length})
       </Button>
     );
   }
@@ -97,7 +99,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
               leftIcon={downloadedIds.has(result.id) ? <FiCheck /> : <FiDownload />}
               onClick={() => handleDownload(result)}
             >
-              {downloadedIds.has(result.id) ? '已下载' : '下载'}
+              {downloadedIds.has(result.id) ? t('converter.downloaded') : t('converter.download')}
             </Button>
           </motion.div>
         ))}
@@ -123,11 +125,11 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
           className="flex-1"
         >
           {results.length === 1 ? (
-            '下载文件'
+            t('converter.downloadFile')
           ) : (
             <span className="flex items-center gap-2">
               <FiArchive />
-              下载全部 ({results.length} 个文件)
+              {t('converter.downloadAll')} ({results.length} {t('converter.files')})
             </span>
           )}
         </Button>
@@ -139,7 +141,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
             leftIcon={<FiDownload />}
             onClick={handleDownloadAll}
           >
-            全部
+            {t('common.all')}
           </Button>
         )}
 
@@ -151,7 +153,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
             onClick={onClear}
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
-            清除
+            {t('common.clear')}
           </Button>
         )}
       </div>
@@ -159,12 +161,12 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
       {/* 文件信息 */}
       <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 px-1">
         <span>
-          {results.length} 个文件 · 总计 {formatFileSize(totalSize)}
+          {results.length} {t('converter.files')} · {t('converter.total')} {formatFileSize(totalSize)}
         </span>
         {allDownloaded && (
           <span className="flex items-center gap-1 text-green-600">
             <FiCheck className="w-4 h-4" />
-            全部已下载
+            {t('converter.allDownloaded')}
           </span>
         )}
       </div>
@@ -224,7 +226,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
                       : undefined
                   }
                 >
-                  {downloadedIds.has(result.id) ? '已下载' : '下载'}
+                  {downloadedIds.has(result.id) ? t('converter.downloaded') : t('converter.download')}
                 </Button>
               </motion.div>
             ))}
@@ -234,7 +236,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
 
       {/* 提示信息 */}
       <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-        文件将在您的浏览器中生成，不会上传到任何服务器
+        {t('converter.browserGenerationNotice')}
       </p>
     </div>
   );
@@ -261,6 +263,7 @@ export const DownloadButtonSingle: React.FC<DownloadButtonSingleProps> = ({
   onDownload,
   className,
 }) => {
+  const { t } = useTranslation();
   const [isDownloaded, setIsDownloaded] = useState(false);
 
   const handleClick = () => {
@@ -298,7 +301,7 @@ export const DownloadButtonSingle: React.FC<DownloadButtonSingleProps> = ({
         onClick={handleClick}
         className={isDownloaded ? 'text-green-600' : undefined}
       >
-        {isDownloaded ? '已下载' : '下载'}
+        {isDownloaded ? t('converter.downloaded') : t('converter.download')}
       </Button>
     </motion.div>
   );

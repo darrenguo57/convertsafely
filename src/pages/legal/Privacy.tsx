@@ -4,6 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   FiShield,
   FiLock,
@@ -104,6 +105,7 @@ const gdprRights = [
 ];
 
 export default function Privacy() {
+  const { t } = useTranslation();
   const lastUpdated = 'January 1, 2025';
 
   return (

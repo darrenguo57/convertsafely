@@ -1,51 +1,52 @@
 import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 interface FooterLink {
-  label: string;
+  key: string;
   href: string;
 }
 
 interface FooterSection {
-  title: string;
+  titleKey: string;
   links: FooterLink[];
 }
 
 const footerSections: FooterSection[] = [
   {
-    title: 'Converters',
+    titleKey: 'converters',
     links: [
-      { label: 'Image Converter', href: '/converter/image' },
-      { label: 'PDF Converter', href: '/converter/pdf' },
-      { label: 'Audio Converter', href: '/converter/audio' },
-      { label: 'Video Converter', href: '/converter/video' },
+      { key: 'imageConverter', href: '/converter/image' },
+      { key: 'pdfConverter', href: '/converter/pdf' },
+      { key: 'audioConverter', href: '/converter/audio' },
+      { key: 'videoConverter', href: '/converter/video' },
     ],
   },
   {
-    title: 'Company',
+    titleKey: 'company',
     links: [
-      { label: 'About Us', href: '/about' },
-      { label: 'Pricing', href: '/pricing' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Contact', href: '/contact' },
+      { key: 'aboutUs', href: '/about' },
+      { key: 'pricing', href: '/pricing' },
+      { key: 'blog', href: '/blog' },
+      { key: 'contact', href: '/contact' },
     ],
   },
   {
-    title: 'Legal',
+    titleKey: 'legal',
     links: [
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
-      { label: 'Cookie Policy', href: '/cookies' },
-      { label: 'GDPR', href: '/gdpr' },
+      { key: 'privacyPolicy', href: '/privacy' },
+      { key: 'termsOfService', href: '/terms' },
+      { key: 'cookiePolicy', href: '/cookies' },
+      { key: 'gdpr', href: '/gdpr' },
     ],
   },
   {
-    title: 'Support',
+    titleKey: 'support',
     links: [
-      { label: 'Help Center', href: '/help' },
-      { label: 'FAQ', href: '/faq' },
-      { label: 'API Docs', href: '/api' },
-      { label: 'Status', href: '/status' },
+      { key: 'helpCenter', href: '/help' },
+      { key: 'faq', href: '/faq' },
+      { key: 'apiDocs', href: '/api' },
+      { key: 'status', href: '/status' },
     ],
   },
 ];
@@ -94,6 +95,7 @@ export interface FooterProps {
  * Designed for North American/European user expectations
  */
 export function Footer({ className }: FooterProps) {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -124,7 +126,7 @@ export function Footer({ className }: FooterProps) {
               </span>
             </Link>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 max-w-xs">
-              Secure, browser-based file conversion. Your files never leave your device.
+              {t('footer.brand')}
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-3">
@@ -145,9 +147,9 @@ export function Footer({ className }: FooterProps) {
 
           {/* Link Sections */}
           {footerSections.map((section) => (
-            <div key={section.title}>
+            <div key={section.titleKey}>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-3">
-                {section.title}
+                {t(`footer.${section.titleKey}`)}
               </h3>
               <ul className="space-y-2">
                 {section.links.map((link) => (
@@ -156,7 +158,7 @@ export function Footer({ className }: FooterProps) {
                       to={link.href}
                       className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
                     >
-                      {link.label}
+                      {t(`footer.${link.key}`)}
                     </Link>
                   </li>
                 ))}
@@ -169,20 +171,19 @@ export function Footer({ className }: FooterProps) {
         <div className="py-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-gray-500 dark:text-gray-500 text-center md:text-left">
-              Your privacy matters. All file conversions happen locally in your browser.
-              We never upload or store your files on our servers.
+              {t('footer.privacyNotice')}
             </p>
             <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
               <Link to="/privacy" className="hover:text-primary transition-colors">
-                Privacy
+                {t('footer.privacyPolicy')}
               </Link>
               <span className="text-gray-300 dark:text-gray-700">|</span>
               <Link to="/cookies" className="hover:text-primary transition-colors">
-                Cookies
+                {t('footer.cookiePolicy')}
               </Link>
               <span className="text-gray-300 dark:text-gray-700">|</span>
               <Link to="/gdpr" className="hover:text-primary transition-colors">
-                GDPR
+                {t('footer.gdpr')}
               </Link>
             </div>
           </div>
@@ -191,7 +192,7 @@ export function Footer({ className }: FooterProps) {
         {/* Bottom Bar */}
         <div className="py-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <p>&copy; {currentYear} ConvertSafely. All rights reserved.</p>
+            <p>&copy; {currentYear} ConvertSafely. {t('footer.copyright')}</p>
             <p className="flex items-center gap-1">
               Made with{' '}
               <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">

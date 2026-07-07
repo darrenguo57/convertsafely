@@ -7,6 +7,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUpload, FiFile, FiX, FiAlertCircle } from 'react-icons/fi';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import type { ConversionFile } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { formatFileSize } from '@/utils/constants';
@@ -42,6 +43,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
   onFilesChange,
   className,
 }) => {
+  const { t } = useTranslation();
   const {
     files,
     status,
@@ -96,14 +98,14 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                 <FiUpload className="w-8 h-8 text-primary" />
               </div>
               <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                {isDragging ? '释放以上传文件' : '拖拽文件到此处'}
+                {isDragging ? t('converter.dragActive') : t('converter.dragFile')}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                或点击选择文件
+                {t('converter.orClick')}
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500">
-                最大文件大小: {formatFileSize(maxFileSize)}
-                {maxFiles > 1 && ` · 最多 ${maxFiles} 个文件`}
+                {t('converter.maxFileSizeLabel')}: {formatFileSize(maxFileSize)}
+                {maxFiles > 1 && ` · ${t('converter.maxFiles')} ${maxFiles} ${t('converter.files')}`}
               </p>
             </motion.div>
           ) : (
@@ -118,10 +120,10 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                 <FiFile className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
               <p className="text-lg font-medium text-gray-900 dark:text-white">
-                已选择 {files.length} 个文件
+                {t('converter.selected')} {files.length} {t('converter.files')}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                总计: {getTotalSize()}
+                {t('converter.total')}: {getTotalSize()}
               </p>
             </motion.div>
           )}
@@ -176,7 +178,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                     removeFile(file.id);
                   }}
                   className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                  aria-label="移除文件"
+                  aria-label={t('converter.removeFile')}
                 >
                   <FiX className="w-5 h-5" />
                 </button>
@@ -194,7 +196,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                     clearFiles();
                   }}
                 >
-                  清空所有
+                  {t('converter.clearAll')}
                 </Button>
               </div>
             )}
@@ -215,7 +217,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
               <FiAlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                  上传失败
+                  {t('converter.uploadFailed')}
                 </p>
                 <ul className="mt-1 space-y-1">
                   {errors.map((error, index) => (
@@ -238,7 +240,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         <div className="text-center py-2">
           <div className="inline-flex items-center gap-2 text-sm text-gray-500">
             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            正在验证文件...
+            {t('converter.validatingFile')}
           </div>
         </div>
       )}

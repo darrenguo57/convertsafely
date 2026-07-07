@@ -4,6 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FiFileText, FiAlertCircle, FiCheckCircle, FiShield, FiDollarSign } from 'react-icons/fi';
 
 const fadeInUp = {
@@ -44,6 +45,7 @@ const termHighlights = [
 ];
 
 export default function Terms() {
+  const { t } = useTranslation();
   const lastUpdated = 'January 1, 2025';
 
   return (

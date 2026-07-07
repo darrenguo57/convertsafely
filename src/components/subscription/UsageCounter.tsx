@@ -6,6 +6,7 @@
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
 import { FiRefreshCw, FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 
 export interface UsageCounterProps {
@@ -35,6 +36,7 @@ export function UsageCounter({
   className,
   compact = false,
 }: UsageCounterProps) {
+  const { t } = useTranslation();
   const isUnlimited = maxUsage === -1;
   const usagePercentage = isUnlimited ? 0 : Math.min((currentUsage / maxUsage) * 100, 100);
   const remaining = isUnlimited ? Infinity : Math.max(0, maxUsage - currentUsage);
@@ -97,7 +99,7 @@ export function UsageCounter({
             </div>
           )}
           <div className="text-xs">
-            <span className="text-gray-600 dark:text-gray-400">剩余</span>
+            <span className="text-gray-600 dark:text-gray-400">{t('subscription.remaining')}</span>
             <span className={clsx('font-medium ml-1', isNearLimit && 'text-amber-600 dark:text-amber-400')}>
               {isUnlimited ? '∞' : remaining}
             </span>
@@ -112,7 +114,7 @@ export function UsageCounter({
             className="text-xs px-2 py-1"
             leftIcon={<FiTrendingUp className="w-3 h-3" />}
           >
-            升级
+            {t('subscription.upgrade')}
           </Button>
         )}
       </div>
@@ -134,12 +136,12 @@ export function UsageCounter({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <h3 className="font-medium text-gray-900 dark:text-white">今日使用</h3>
+          <h3 className="font-medium text-gray-900 dark:text-white">{t('subscription.todayUsage')}</h3>
           {isAtLimit && (
             <FiAlertCircle className="w-5 h-5 text-red-500" />
           )}
         </div>
-        <span className="text-sm text-gray-500 dark:text-gray-400">{planName} 计划</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">{planName} {t('subscription.plan')}</span>
       </div>
 
       {/* Usage display */}
@@ -159,7 +161,7 @@ export function UsageCounter({
           </span>
           {!isUnlimited && (
             <span className="text-gray-500 dark:text-gray-400">
-              / {maxUsage} 次
+              / {maxUsage} {t('subscription.times')}
             </span>
           )}
         </div>
@@ -189,12 +191,12 @@ export function UsageCounter({
         )}
       >
         {isUnlimited
-          ? '您可以无限制地进行转换'
+          ? t('subscription.unlimitedConversions')
           : isAtLimit
-          ? '今日转换次数已用完，请明天再来或升级计划'
+          ? t('subscription.dailyLimitReached')
           : isNearLimit
-          ? `仅剩 ${remaining} 次转换机会，考虑升级以获得更多配额`
-          : `今日剩余 ${remaining} 次转换机会`}
+          ? t('subscription.nearLimit', { count: remaining })
+          : t('subscription.remainingConversions', { count: remaining })}
       </p>
 
       {/* Upgrade CTA */}
@@ -206,7 +208,7 @@ export function UsageCounter({
           onClick={onUpgrade}
           leftIcon={<FiTrendingUp className="w-4 h-4" />}
         >
-          {isAtLimit ? '立即升级' : '升级计划'}
+          {isAtLimit ? t('pricing.upgradeNow') : t('subscription.upgradePlan')}
         </Button>
       )}
     </div>

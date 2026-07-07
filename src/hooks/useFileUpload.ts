@@ -101,7 +101,7 @@ export function useFileUpload(options: UseFileUploadOptions) {
         }
       } catch (error) {
         setStatus('error');
-        const errorMsg = error instanceof Error ? error.message : '验证失败';
+        const errorMsg = error instanceof Error ? error.message : 'Validation failed';
         const uploadErrors = fileArray.map((file) => ({ file, reason: errorMsg }));
         setErrors(uploadErrors);
         onError?.(uploadErrors);

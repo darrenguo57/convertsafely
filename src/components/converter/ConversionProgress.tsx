@@ -13,6 +13,7 @@ import {
   FiClock,
 } from 'react-icons/fi';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/Progress';
 import type { ConversionProgress as ConversionProgressType } from '@/hooks/useConversion';
 import type { ConversionStatus } from '@/hooks/useConversion';
@@ -38,6 +39,7 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
   className,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   const isPreparing = status === 'preparing';
   const isConverting = status === 'converting';
   const isCompleted = status === 'completed';
@@ -54,10 +56,10 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
     const remainingSeconds = remainingFiles * avgTimePerFile;
     
     if (remainingSeconds < 60) {
-      return `约 ${Math.round(remainingSeconds)} 秒`;
+      return t('converter.estimatedSeconds', { count: Math.round(remainingSeconds) });
     }
-    return `约 ${Math.round(remainingSeconds / 60)} 分钟`;
-  }, [isConverting, progress]);
+    return t('converter.estimatedMinutes', { count: Math.round(remainingSeconds / 60) });
+  }, [isConverting, progress, t]);
 
   return (
     <motion.div
@@ -118,18 +120,18 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
               !isActive && !isCompleted && !isError && 'text-gray-700 dark:text-gray-300'
             )}
           >
-            {isPreparing && '准备中...'}
-            {isConverting && '正在转换'}
-            {isCompleted && '转换完成'}
-            {isError && '转换失败'}
-            {!isActive && !isCompleted && !isError && '等待开始'}
+            {isPreparing && t('converter.preparing')}
+            {isConverting && t('converter.converting')}
+            {isCompleted && t('converter.completed')}
+            {isError && t('converter.conversionFailed')}
+            {!isActive && !isCompleted && !isError && t('converter.waitingToStart')}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {isPreparing && '正在准备文件...'}
+            {isPreparing && t('converter.preparingFiles')}
             {isConverting && progress.currentFileName}
-            {isCompleted && `成功转换 ${progress.totalFiles} 个文件`}
-            {isError && '请检查文件后重试'}
-            {!isActive && !isCompleted && !isError && '点击开始转换按钮'}
+            {isCompleted && t('converter.successCount', { count: progress.totalFiles })}
+            {isError && t('converter.checkAndRetry')}
+            {!isActive && !isCompleted && !isError && t('converter.clickStartConversion')}
           </p>
         </div>
 
@@ -139,7 +141,7 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
             onClick={onCancel}
             className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
           >
-            取消
+            {t('common.cancel')}
           </button>
         )}
       </div>
@@ -151,10 +153,10 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                总体进度
+                {t('converter.overallProgress')}
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {progress.currentFile} / {progress.totalFiles} 文件
+                {progress.currentFile} / {progress.totalFiles} {t('converter.file')}
               </span>
             </div>
             <Progress
@@ -171,7 +173,7 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  当前文件
+                  {t('converter.currentFile')}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   {progress.fileProgress}%
@@ -189,7 +191,7 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
           {estimatedTime && (
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <FiClock className="w-4 h-4" />
-              <span>预计剩余时间: {estimatedTime}</span>
+              <span>{t('converter.estimatedTimeRemaining')}: {estimatedTime}</span>
             </div>
           )}
         </div>

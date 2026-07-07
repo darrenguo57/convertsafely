@@ -22,6 +22,7 @@ import {
 } from 'react-icons/fi';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 import { useSubscription } from '@/hooks/useSubscription';
 import type { ConversionFile, ConversionResult } from '@/types';
@@ -55,9 +56,11 @@ type PDFTool = 'merge' | 'split' | 'images-to-pdf';
 type ConversionStatus = 'idle' | 'converting' | 'completed' | 'error';
 
 export default function PDFConverter() {
+  const { t } = useTranslation();
+
   // 订阅状态
   const { limits, canPerformConversion, validateFileSize, incrementUsage, getValidationError } = useSubscription();
-  
+
   // 本地状态
   const [activeTool, setActiveTool] = useState<PDFTool>('merge');
   const [files, setFiles] = useState<ConversionFile[]>([]);
@@ -86,9 +89,9 @@ export default function PDFConverter() {
 
   // 工具配置
   const tools: { id: PDFTool; label: string; icon: React.ElementType; description: string }[] = [
-    { id: 'merge', label: '合并 PDF', icon: FiLayers, description: '将多个 PDF 文件合并为一个' },
-    { id: 'split', label: '拆分 PDF', icon: FiScissors, description: '将一个 PDF 拆分为多个文件' },
-    { id: 'images-to-pdf', label: '图片转 PDF', icon: FiImage, description: '将图片转换为 PDF 文件' },
+    { id: 'merge', label: t('pdf.merge'), icon: FiLayers, description: t('pdf.mergeDesc') },
+    { id: 'split', label: t('pdf.split'), icon: FiScissors, description: t('pdf.splitDesc') },
+    { id: 'images-to-pdf', label: t('pdf.imagesToPdf'), icon: FiImage, description: t('pdf.imagesToPdfDesc') },
   ];
 
   // 文件上传处理
@@ -102,19 +105,19 @@ export default function PDFConverter() {
     const validFiles: ConversionFile[] = [];
     for (const file of acceptedFiles) {
       if (!validateFileSize(file.size)) {
-        toast.error(`${file.name}: 文件大小超过 ${limits.maxFileSizeMB}MB 限制`);
+        toast.error(t('errors.fileTooLarge', { name: file.name, size: limits.maxFileSizeMB }));
         continue;
       }
 
       // 根据工具类型验证文件
       if (activeTool === 'images-to-pdf') {
         if (!file.type.startsWith('image/')) {
-          toast.error(`${file.name}: 请上传图片文件`);
+          toast.error(`${file.name}: ${t('pdf.notImage')}`);
           continue;
         }
       } else {
         if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-          toast.error(`${file.name}: 请上传 PDF 文件`);
+          toast.error(`${file.name}: ${t('pdf.notPdf')}`);
           continue;
         }
       }
@@ -133,11 +136,11 @@ export default function PDFConverter() {
     setStatus('idle');
     setResults([]);
     setError(null);
-  }, [files.length, activeTool, limits.maxFileSizeMB, validateFileSize, getValidationError]);
+  }, [files.length, activeTool, limits.maxFileSizeMB, validateFileSize, getValidationError, t]);
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
     onDrop,
-    accept: activeTool === 'images-to-pdf' 
+    accept: activeTool === 'images-to-pdf'
       ? { 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'] }
       : { 'application/pdf': ['.pdf'] },
     maxFiles: limits.batchSize,
@@ -168,12 +171,12 @@ export default function PDFConverter() {
   // 执行转换
   const startConversion = useCallback(async () => {
     if (files.length === 0) {
-      toast.error('请先选择文件');
+      toast.error(t('errors.pleaseSelectFile'));
       return;
     }
 
     if (!canPerformConversion(files.length)) {
-      toast.error('今日转换次数已达上限，请升级订阅计划');
+      toast.error(t('pdf.limitReached'));
       return;
     }
 
@@ -187,7 +190,7 @@ export default function PDFConverter() {
       switch (activeTool) {
         case 'merge': {
           if (files.length < 2) {
-            throw new Error('请至少选择两个 PDF 文件进行合并');
+            throw new Error(t('pdf.atLeastTwo'));
           }
           const result = await mergePDFs(files, mergeOptions, undefined, setProgress);
           conversionResults = [mergeResultToConversionResult(result, files)];
@@ -196,7 +199,7 @@ export default function PDFConverter() {
 
         case 'split': {
           if (files.length !== 1) {
-            throw new Error('请选择一个 PDF 文件进行拆分');
+            throw new Error(t('pdf.selectOnePdf'));
           }
           const options: SplitOptions = {
             mode: splitMode,
@@ -220,14 +223,14 @@ export default function PDFConverter() {
       setResults(conversionResults);
       setStatus('completed');
       incrementUsage();
-      toast.success('转换完成！');
+      toast.success(t('pdf.processComplete'));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '转换失败';
+      const errorMessage = err instanceof Error ? err.message : t('errors.conversionFailed');
       setError(errorMessage);
       setStatus('error');
       toast.error(errorMessage);
     }
-  }, [files, activeTool, canPerformConversion, incrementUsage, mergeOptions, splitMode, pageRanges, pagesPerFile, pdfOptions]);
+  }, [files, activeTool, canPerformConversion, incrementUsage, mergeOptions, splitMode, pageRanges, pagesPerFile, pdfOptions, t]);
 
   // 下载结果
   const downloadResult = useCallback((result: ConversionResult) => {
@@ -239,8 +242,8 @@ export default function PDFConverter() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success('下载已开始');
-  }, []);
+    toast.success(t('errors.downloadStarted'));
+  }, [t]);
 
   // 下载所有
   const downloadAll = useCallback(() => {
@@ -260,10 +263,10 @@ export default function PDFConverter() {
       {/* 页面标题 */}
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          PDF 工具箱
+          {t('pdf.title')}
         </h1>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          合并、拆分、转换 PDF 文件。所有处理在浏览器本地完成，保护您的隐私。
+          {t('pdf.subtitle')}
         </p>
       </div>
 
@@ -273,13 +276,13 @@ export default function PDFConverter() {
           <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
             <FiSettings className="w-4 h-4" />
             <span>
-              今日剩余转换次数: <strong>{limits.remainingConversions === Infinity ? '无限制' : limits.remainingConversions}</strong>
+              {t('converter.remaining')}: <strong>{limits.remainingConversions === Infinity ? t('converter.unlimited') : limits.remainingConversions}</strong>
               {' · '}
-              文件大小限制: <strong>{limits.maxFileSizeMB}MB</strong>
+              {t('converter.fileSizeLimit')}: <strong>{limits.maxFileSizeMB}MB</strong>
             </span>
           </div>
           <div className="text-sm text-blue-600 dark:text-blue-300">
-            批量上限: <strong>{limits.batchSize}</strong> 个文件
+            {t('converter.batchLimit')}: <strong>{limits.batchSize}</strong> {t('converter.files')}
           </div>
         </div>
       </div>
@@ -332,20 +335,20 @@ export default function PDFConverter() {
             <FiUpload className="w-10 h-10 text-primary" />
           </div>
           <p className="text-xl font-medium text-gray-900 dark:text-white mb-2">
-            {isDragActive 
-              ? `释放以上传${activeTool === 'images-to-pdf' ? '图片' : 'PDF'}` 
-              : `拖拽${activeTool === 'images-to-pdf' ? '图片' : 'PDF'}到此处`}
+            {isDragActive
+              ? t('converter.dragActive')
+              : t('converter.dragFile')}
           </p>
           <p className="text-gray-500 dark:text-gray-400 mb-4">
-            或点击选择文件
+            {t('converter.orClick')}
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            {activeTool === 'images-to-pdf' 
-              ? '支持 PNG, JPG, WebP, GIF, BMP' 
-              : '支持 PDF 格式'}
+            {activeTool === 'images-to-pdf'
+              ? t('pdf.selectImage')
+              : t('pdf.selectPdf')}
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-            最大 {limits.maxFileSizeMB}MB · 最多 {limits.batchSize} 个文件
+            {t('converter.maxFileSize', { size: limits.maxFileSizeMB })} · {t('converter.maxFiles', { count: limits.batchSize })}
           </p>
         </motion.div>
       )}
@@ -363,14 +366,14 @@ export default function PDFConverter() {
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <FiSettings className="w-5 h-5" />
-                {tools.find(t => t.id === activeTool)?.label} 设置
+                {tools.find(t => t.id === activeTool)?.label} {t('converter.settings')}
               </h3>
 
               {/* 合并设置 */}
               {activeTool === 'merge' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    输出文件名
+                    {t('pdf.outputName')}
                   </label>
                   <input
                     type="text"
@@ -380,7 +383,7 @@ export default function PDFConverter() {
                     placeholder="merged.pdf"
                   />
                   <p className="text-xs text-gray-500 mt-2">
-                    将按顺序合并 {files.length} 个 PDF 文件
+                    {t('pdf.mergeOrder', { count: files.length })}
                   </p>
                 </div>
               )}
@@ -390,7 +393,7 @@ export default function PDFConverter() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      拆分模式
+                      {t('pdf.splitMode')}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {(['range', 'single', 'extract'] as SplitMode[]).map((mode) => (
@@ -404,9 +407,9 @@ export default function PDFConverter() {
                               : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                           )}
                         >
-                          {mode === 'range' && '按范围'}
-                          {mode === 'single' && '每页拆分'}
-                          {mode === 'extract' && '提取页面'}
+                          {mode === 'range' && t('pdf.byRange')}
+                          {mode === 'single' && t('pdf.byPage')}
+                          {mode === 'extract' && t('pdf.extract')}
                         </button>
                       ))}
                     </div>
@@ -415,7 +418,7 @@ export default function PDFConverter() {
                   {splitMode === 'range' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        页面范围 (例如: 1-3,5,7-10)
+                        {t('pdf.pageRange')}
                       </label>
                       <input
                         type="text"
@@ -430,7 +433,7 @@ export default function PDFConverter() {
                   {splitMode === 'single' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        每文件页数
+                        {t('pdf.pagesPerFile')}
                       </label>
                       <input
                         type="number"
@@ -449,30 +452,30 @@ export default function PDFConverter() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      页面尺寸
+                      {t('pdf.pageSize')}
                     </label>
                     <select
                       value={pdfOptions.pageSize}
                       onChange={(e) => setPdfOptions({ ...pdfOptions, pageSize: e.target.value as PageSize })}
                       className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
-                      <option value="original">原始尺寸</option>
-                      <option value="fit">自适应</option>
-                      <option value="a4">A4</option>
-                      <option value="letter">Letter</option>
+                      <option value="original">{t('pdf.original')}</option>
+                      <option value="fit">{t('pdf.fit')}</option>
+                      <option value="a4">{t('pdf.a4')}</option>
+                      <option value="letter">{t('pdf.letter')}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      页面方向
+                      {t('pdf.orientation')}
                     </label>
                     <select
                       value={pdfOptions.orientation}
                       onChange={(e) => setPdfOptions({ ...pdfOptions, orientation: e.target.value as 'portrait' | 'landscape' })}
                       className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
-                      <option value="portrait">纵向</option>
-                      <option value="landscape">横向</option>
+                      <option value="portrait">{t('pdf.portrait')}</option>
+                      <option value="landscape">{t('pdf.landscape')}</option>
                     </select>
                   </div>
                 </div>
@@ -483,7 +486,7 @@ export default function PDFConverter() {
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h3 className="font-semibold text-gray-900 dark:text-white">
-                  已选择 {files.length} 个文件
+                  {t('converter.filesSelected')} {files.length} {t('converter.files')}
                 </h3>
                 <Button
                   variant="ghost"
@@ -493,10 +496,10 @@ export default function PDFConverter() {
                   className="text-red-500 hover:text-red-600"
                 >
                   <FiTrash2 className="w-4 h-4 mr-1" />
-                  清空
+                  {t('converter.clear')}
                 </Button>
               </div>
-              
+
               <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto">
                 {files.map((file, index) => (
                   <motion.div
@@ -548,7 +551,7 @@ export default function PDFConverter() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <FiLoader className="w-6 h-6 text-primary animate-spin" />
-                  <span className="font-medium text-gray-900 dark:text-white">正在处理...</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{t('pdf.processing')}</span>
                 </div>
                 <Progress value={progress} size="lg" showLabel />
               </motion.div>
@@ -564,7 +567,7 @@ export default function PDFConverter() {
                 <div className="flex items-center gap-3">
                   <FiAlertCircle className="w-6 h-6 text-red-500" />
                   <div>
-                    <p className="font-medium text-red-800 dark:text-red-200">处理失败</p>
+                    <p className="font-medium text-red-800 dark:text-red-200">{t('pdf.processFailed')}</p>
                     <p className="text-sm text-red-600 dark:text-red-300">{error}</p>
                   </div>
                 </div>
@@ -584,10 +587,10 @@ export default function PDFConverter() {
                   </div>
                   <div>
                     <p className="font-semibold text-green-800 dark:text-green-200">
-                      处理完成！
+                      {t('pdf.processComplete')}
                     </p>
                     <p className="text-sm text-green-600 dark:text-green-300">
-                      生成 {results.length} 个文件
+                      {t('pdf.generatedCount', { count: results.length })}
                     </p>
                   </div>
                 </div>
@@ -614,7 +617,7 @@ export default function PDFConverter() {
                         onClick={() => downloadResult(result)}
                       >
                         <FiDownload className="w-4 h-4 mr-1" />
-                        下载
+                        {t('converter.download')}
                       </Button>
                     </div>
                   ))}
@@ -623,7 +626,7 @@ export default function PDFConverter() {
                 {results.length > 1 && (
                   <Button onClick={downloadAll} className="w-full">
                     <FiDownload className="w-4 h-4 mr-2" />
-                    下载所有文件
+                    {t('converter.downloadAll')}
                   </Button>
                 )}
               </motion.div>
@@ -652,7 +655,7 @@ export default function PDFConverter() {
                 disabled={status === 'converting' || files.length >= limits.batchSize}
               >
                 <FiUpload className="w-4 h-4 mr-2" />
-                添加更多
+                {t('converter.addMore')}
               </Button>
               <Button
                 className="flex-1"
@@ -662,14 +665,14 @@ export default function PDFConverter() {
                 {status === 'converting' ? (
                   <>
                     <FiLoader className="w-4 h-4 mr-2 animate-spin" />
-                    处理中...
+                    {t('pdf.processing')}
                   </>
                 ) : (
                   <>
                     {activeTool === 'merge' && <FiLayers className="w-4 h-4 mr-2" />}
                     {activeTool === 'split' && <FiScissors className="w-4 h-4 mr-2" />}
                     {activeTool === 'images-to-pdf' && <FiImage className="w-4 h-4 mr-2" />}
-                    开始{tools.find(t => t.id === activeTool)?.label}
+                    {t('converter.startConversion')}
                   </>
                 )}
               </Button>
@@ -688,7 +691,7 @@ export default function PDFConverter() {
           <div className="flex items-start gap-3">
             <FiAlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-red-800 dark:text-red-200">部分文件无法上传</p>
+              <p className="font-medium text-red-800 dark:text-red-200">{t('converter.someFilesRejected')}</p>
               <ul className="mt-1 text-sm text-red-600 dark:text-red-300">
                 {fileRejections.map(({ file, errors }, index) => (
                   <li key={index}>

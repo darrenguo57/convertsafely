@@ -5,6 +5,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { SUBSCRIPTION_PLANS } from '@/types';
@@ -41,6 +42,8 @@ export function UpgradeModal({
   message,
   isLoading = false,
 }: UpgradeModalProps) {
+  const { t } = useTranslation();
+
   // Get upgrade options (plans better than current)
   const upgradePlans = SUBSCRIPTION_PLANS.filter((plan) => {
     if (currentPlan === 'free') return plan.id !== 'free';
@@ -147,7 +150,7 @@ export function UpgradeModal({
                   <div className="flex flex-wrap gap-2">
                     {plan.features.noAds && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                        无广告
+                        {t('pricing.noAds')}
                       </span>
                     )}
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
@@ -155,7 +158,7 @@ export function UpgradeModal({
                     </span>
                     {plan.id === 'enterprise' && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400">
-                        API 访问
+                        {t('pricing.apiAccess')}
                       </span>
                     )}
                   </div>
@@ -197,7 +200,7 @@ export function UpgradeModal({
                   clipRule="evenodd"
                 />
               </svg>
-              安全支付
+              {t('pricing.securePayment')}
             </span>
             <span className="flex items-center gap-1">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -207,7 +210,7 @@ export function UpgradeModal({
                   clipRule="evenodd"
                 />
               </svg>
-              随时取消
+              {t('pricing.cancelAnytime')}
             </span>
             <span className="flex items-center gap-1">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

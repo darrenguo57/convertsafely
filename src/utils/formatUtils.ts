@@ -15,11 +15,11 @@ export type FormatCategory = 'image' | 'video' | 'audio' | 'pdf' | 'document';
  */
 export const getCategoryDisplayName = (category: FormatCategory): string => {
   const names: Record<FormatCategory, string> = {
-    image: '图片',
-    video: '视频',
-    audio: '音频',
+    image: 'Image',
+    video: 'Video',
+    audio: 'Audio',
     pdf: 'PDF',
-    document: '文档',
+    document: 'Document',
   };
   return names[category] || category;
 };
@@ -274,22 +274,22 @@ export const parseFormatFromMimeType = (mimeType: string): string | null => {
 export const getFormatDescription = (format: string): string => {
   const descriptions: Record<string, string> = {
     // Images
-    jpg: '广泛兼容的有损压缩格式，适合照片',
-    png: '无损压缩格式，支持透明背景',
-    webp: '现代格式，更好的压缩率',
-    gif: '支持动画，256色限制',
+    jpg: 'Widely compatible lossy compression format, suitable for photos',
+    png: 'Lossless compression format, supports transparent background',
+    webp: 'Modern format with better compression ratio',
+    gif: 'Supports animation, 256 color limit',
     // Videos
-    mp4: '最广泛支持的视频格式',
-    webm: '开源格式，适合网页',
-    mov: 'Apple QuickTime 格式',
+    mp4: 'Most widely supported video format',
+    webm: 'Open-source format, suitable for web',
+    mov: 'Apple QuickTime format',
     // Audio
-    mp3: '最广泛支持的音频格式',
-    wav: '无损音频格式，文件较大',
-    flac: '无损压缩音频格式',
+    mp3: 'Most widely supported audio format',
+    wav: 'Lossless audio format, larger file size',
+    flac: 'Lossless compressed audio format',
     // Documents
-    pdf: '便携式文档格式',
-    docx: 'Microsoft Word 文档',
-    txt: '纯文本格式',
+    pdf: 'Portable Document Format',
+    docx: 'Microsoft Word Document',
+    txt: 'Plain text format',
   };
-  return descriptions[format.toLowerCase()] || `${format.toUpperCase()} 格式`;
+  return descriptions[format.toLowerCase()] || `${format.toUpperCase()} format`;
 };

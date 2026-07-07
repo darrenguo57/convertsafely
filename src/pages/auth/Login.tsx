@@ -8,6 +8,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiChrome } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
@@ -23,6 +24,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login, loginWithGoogle, isAuthenticated, isLoading: authLoading, error, clearError } = useAuth();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,7 +53,7 @@ export default function Login() {
     e.preventDefault();
 
     if (!email || !password) {
-      toast.error('请输入邮箱和密码');
+      toast.error(t('auth.enterCredentials'));
       return;
     }
 
@@ -59,7 +61,7 @@ export default function Login() {
     try {
       await login(email, password);
       trackEvent('login', { method: 'email' });
-      toast.success('登录成功！');
+      toast.success(t('auth.loginSuccess'));
       navigate(redirectTo);
     } catch (error) {
       // Error is handled by useAuth hook
@@ -75,7 +77,7 @@ export default function Login() {
       try {
         await signInWithGoogle();
         trackEvent('login', { method: 'google' });
-        toast.success('Google 登录成功！');
+        toast.success(t('auth.googleSuccess'));
         navigate(redirectTo);
         return;
       } catch (firebaseError) {
@@ -85,10 +87,10 @@ export default function Login() {
 
       await loginWithGoogle();
       trackEvent('login', { method: 'google' });
-      toast.success('Google 登录成功！');
+      toast.success(t('auth.googleSuccess'));
       navigate(redirectTo);
     } catch (error) {
-      toast.error('Google 登录失败，请重试');
+      toast.error(t('auth.googleFailed'));
     } finally {
       setIsGoogleLoading(false);
     }
@@ -116,9 +118,9 @@ export default function Login() {
 
         <Card padding="lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">欢迎回来</CardTitle>
+            <CardTitle className="text-2xl">{t('auth.welcomeBack')}</CardTitle>
             <CardDescription>
-              登录您的账户以继续
+              {t('auth.loginSubtitle')}
             </CardDescription>
           </CardHeader>
 
@@ -133,7 +135,7 @@ export default function Login() {
               leftIcon={<FiChrome className="w-5 h-5 text-red-500" />}
               className="mb-4"
             >
-              使用 Google 登录
+              {t('auth.googleSignIn')}
             </Button>
 
             {/* Divider */}
@@ -143,7 +145,7 @@ export default function Login() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                  或使用邮箱登录
+                  {t('auth.orEmail')}
                 </span>
               </div>
             </div>
@@ -152,7 +154,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  邮箱地址
+                  {t('auth.email')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -172,7 +174,7 @@ export default function Login() {
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  密码
+                  {t('auth.password')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -205,14 +207,14 @@ export default function Login() {
                     className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                   />
                   <label htmlFor="remember" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                    记住我
+                    {t('auth.rememberMe')}
                   </label>
                 </div>
                 <Link
                   to="/forgot-password"
                   className="text-sm font-medium text-primary hover:text-primary-dark"
                 >
-                  忘记密码？
+                  {t('auth.forgotPassword')}
                 </Link>
               </div>
 
@@ -224,18 +226,18 @@ export default function Login() {
                 disabled={isGoogleLoading}
                 rightIcon={<FiArrowRight className="w-4 h-4" />}
               >
-                登录
+                {t('auth.login')}
               </Button>
             </form>
 
             {/* Sign Up Link */}
             <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-              还没有账户？{' '}
+              {t('auth.noAccount')}{' '}
               <Link
                 to={`/signup${redirectTo !== '/' ? `?redirect=${redirectTo}` : ''}`}
                 className="font-medium text-primary hover:text-primary-dark"
               >
-                立即注册
+                {t('auth.signUpNow')}
               </Link>
             </p>
           </CardContent>
@@ -247,7 +249,7 @@ export default function Login() {
             to="/"
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           >
-            ← 返回首页
+            {t('auth.backToHome')}
           </Link>
         </p>
       </motion.div>

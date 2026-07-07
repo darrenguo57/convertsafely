@@ -173,15 +173,15 @@ export function useSubscription() {
    */
   const getValidationError = useCallback((fileCount: number = 1, fileSize?: number): string | null => {
     if (!limits.canConvert) {
-      return '今日转换次数已达上限，请升级订阅计划';
+      return 'Daily conversion limit reached. Please upgrade your subscription plan';
     }
     
     if (fileCount > limits.batchSize) {
-      return `批量转换最多支持 ${limits.batchSize} 个文件`;
+      return `Batch conversion supports up to ${limits.batchSize} files`;
     }
     
     if (fileSize && fileSize > limits.maxFileSize) {
-      return `文件大小超过限制 (${limits.maxFileSizeMB}MB)`;
+      return `File size exceeds limit (${limits.maxFileSizeMB}MB)`;
     }
     
     return null;

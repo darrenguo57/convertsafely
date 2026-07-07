@@ -7,6 +7,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck, FiInfo } from 'react-icons/fi';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import {
   getCategoryOutputFormats,
   getFormatDisplayName,
@@ -42,9 +43,10 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
   onChange,
   disabled = false,
   className,
-  placeholder = '选择输出格式',
-  label = '输出格式',
+  placeholder,
+  label,
 }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -148,7 +150,7 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
               </div>
             </>
           ) : (
-            <span className="text-gray-500 dark:text-gray-400">{placeholder}</span>
+            <span className="text-gray-500 dark:text-gray-400">{placeholder || t('converter.selectOutputFormat')}</span>
           )}
         </div>
         <FiChevronDown
@@ -226,7 +228,7 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
       {/* 提示信息 */}
       <div className="mt-2 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
         <FiInfo className="w-4 h-4 flex-shrink-0 mt-0.5" />
-        <p>选择适合您需求的输出格式。不同格式有不同的兼容性和文件大小。</p>
+        <p>{t('converter.formatSelectorHint')}</p>
       </div>
     </div>
   );

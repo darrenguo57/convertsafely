@@ -6,6 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   FiImage,
   FiFileText,
@@ -47,26 +48,26 @@ const scaleIn = {
 const features = [
   {
     icon: FiShield,
-    title: '100% Private',
-    description: 'All conversions happen locally in your browser. Your files never leave your device.',
+    titleKey: 'home.featurePrivate',
+    descriptionKey: 'home.featurePrivateDesc',
     color: 'from-emerald-500 to-teal-600',
   },
   {
     icon: FiZap,
-    title: 'Lightning Fast',
-    description: 'Powered by WebAssembly for blazing-fast conversions without server delays.',
+    titleKey: 'home.featureFast',
+    descriptionKey: 'home.featureFastDesc',
     color: 'from-amber-500 to-orange-600',
   },
   {
     icon: FiSmile,
-    title: 'Easy to Use',
-    description: 'Drag, drop, and convert. No registration required. Simple as that.',
+    titleKey: 'home.featureEasy',
+    descriptionKey: 'home.featureEasyDesc',
     color: 'from-blue-500 to-indigo-600',
   },
   {
     icon: FiAward,
-    title: 'Premium Quality',
-    description: 'High-fidelity conversions with advanced settings for professional results.',
+    titleKey: 'home.featureQuality',
+    descriptionKey: 'home.featureQualityDesc',
     color: 'from-purple-500 to-pink-600',
   },
 ];
@@ -75,46 +76,48 @@ const features = [
 const converters = [
   {
     icon: FiImage,
-    title: 'Image Converter',
-    description: 'JPG, PNG, WebP, GIF, AVIF, TIFF',
+    titleKey: 'home.imageTitle',
+    descriptionKey: 'home.imageDesc',
     path: '/converter/image',
     color: 'bg-gradient-to-br from-purple-500 to-indigo-600',
-    features: ['Batch conversion', 'Quality control', 'Resize options'],
+    featureKeys: ['home.imageFeature1', 'home.imageFeature2', 'home.imageFeature3'],
   },
   {
     icon: FiFileText,
-    title: 'PDF Converter',
-    description: 'PDF to Word, Excel, Images & more',
+    titleKey: 'home.pdfTitle',
+    descriptionKey: 'home.pdfDesc',
     path: '/converter/pdf',
     color: 'bg-gradient-to-br from-red-500 to-rose-600',
-    features: ['Merge & split', 'Compress', 'Extract text'],
+    featureKeys: ['home.pdfFeature1', 'home.pdfFeature2', 'home.pdfFeature3'],
   },
   {
     icon: FiVideo,
-    title: 'Video Converter',
-    description: 'MP4, AVI, MOV, WebM, MKV',
+    titleKey: 'home.videoTitle',
+    descriptionKey: 'home.videoDesc',
     path: '/converter/video',
     color: 'bg-gradient-to-br from-cyan-500 to-blue-600',
-    features: ['Trim & crop', 'Codec options', 'Resolution'],
+    featureKeys: ['home.videoFeature1', 'home.videoFeature2', 'home.videoFeature3'],
   },
   {
     icon: FiMusic,
-    title: 'Audio Converter',
-    description: 'MP3, WAV, AAC, OGG, FLAC',
+    titleKey: 'home.audioTitle',
+    descriptionKey: 'home.audioDesc',
     path: '/converter/audio',
     color: 'bg-gradient-to-br from-emerald-500 to-teal-600',
-    features: ['Bitrate control', 'Trim audio', 'Metadata'],
+    featureKeys: ['home.audioFeature1', 'home.audioFeature2', 'home.audioFeature3'],
   },
 ];
 
 // Trust badges
 const trustBadges = [
-  { icon: FiLock, text: 'No Uploads Required' },
-  { icon: FiServer, text: 'Zero Server Storage' },
-  { icon: FiClock, text: 'Instant Processing' },
+  { icon: FiLock, textKey: 'home.noUploads' },
+  { icon: FiServer, textKey: 'home.zeroStorage' },
+  { icon: FiClock, textKey: 'home.instantProcessing' },
 ];
 
 export default function Home() {
+  const { t } = useTranslation();
+
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
@@ -137,7 +140,7 @@ export default function Home() {
             <motion.div variants={fadeInUp} className="mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-medium border border-emerald-200 dark:border-emerald-800">
                 <FiShield className="w-4 h-4" />
-                Privacy-First File Conversion
+                {t('home.trustBadge')}
               </span>
             </motion.div>
 
@@ -146,7 +149,7 @@ export default function Home() {
               variants={fadeInUp}
               className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight"
             >
-              Convert Files{' '}
+              {t('home.title')}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">
                 Safely
               </span>
@@ -157,9 +160,9 @@ export default function Home() {
               variants={fadeInUp}
               className="text-xl sm:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8 leading-relaxed"
             >
-              Transform images, PDFs, videos, and audio files instantly in your browser.
+              {t('home.subtitle')}
               <span className="block mt-2 font-medium text-gray-900 dark:text-white">
-                No uploads. No tracking. 100% private.
+                {t('home.subtitleHighlight')}
               </span>
             </motion.p>
 
@@ -170,13 +173,13 @@ export default function Home() {
             >
               <Link to="/converter/image">
                 <Button size="lg" className="text-lg px-8 py-4 group">
-                  Start Converting Free
+                  {t('home.startConverting')}
                   <FiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link to="/pricing">
                 <Button variant="outline" size="lg" className="text-lg px-8 py-4">
-                  View Pricing
+                  {t('home.viewPricing')}
                 </Button>
               </Link>
             </motion.div>
@@ -187,9 +190,9 @@ export default function Home() {
               className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400"
             >
               {trustBadges.map((badge) => (
-                <div key={badge.text} className="flex items-center gap-2">
+                <div key={badge.textKey} className="flex items-center gap-2">
                   <badge.icon className="w-4 h-4 text-primary" />
-                  <span>{badge.text}</span>
+                  <span>{t(badge.textKey)}</span>
                 </div>
               ))}
             </motion.div>
@@ -227,13 +230,13 @@ export default function Home() {
               variants={fadeInUp}
               className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4"
             >
-              Why Choose ConvertSafely?
+              {t('home.whyChoose')}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
               className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
             >
-              Built with privacy and performance at its core
+              {t('home.whySubtitle')}
             </motion.p>
           </motion.div>
 
@@ -246,7 +249,7 @@ export default function Home() {
           >
             {features.map((feature) => (
               <motion.div
-                key={feature.title}
+                key={feature.titleKey}
                 variants={scaleIn}
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
                 className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow"
@@ -257,10 +260,10 @@ export default function Home() {
                   <feature.icon className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  {feature.title}
+                  {t(feature.titleKey)}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {feature.description}
+                  {t(feature.descriptionKey)}
                 </p>
               </motion.div>
             ))}
@@ -282,13 +285,13 @@ export default function Home() {
               variants={fadeInUp}
               className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4"
             >
-              All-in-One Conversion Tools
+              {t('home.allInOne')}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
               className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
             >
-              Powerful converters for every file type you need
+              {t('home.allInOneSubtitle')}
             </motion.p>
           </motion.div>
 
@@ -300,7 +303,7 @@ export default function Home() {
             className="grid md:grid-cols-2 gap-8"
           >
             {converters.map((converter) => (
-              <motion.div key={converter.title} variants={scaleIn}>
+              <motion.div key={converter.titleKey} variants={scaleIn}>
                 <Link to={converter.path}>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
@@ -315,19 +318,19 @@ export default function Home() {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
-                          {converter.title}
+                          {t(converter.titleKey)}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          {converter.description}
+                          {t(converter.descriptionKey)}
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {converter.features.map((feature) => (
+                          {converter.featureKeys.map((fk) => (
                             <span
-                              key={feature}
+                              key={fk}
                               className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300"
                             >
                               <FiCheck className="w-3 h-3 text-primary" />
-                              {feature}
+                              {t(fk)}
                             </span>
                           ))}
                         </div>
@@ -356,13 +359,13 @@ export default function Home() {
               variants={fadeInUp}
               className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4"
             >
-              Simple, Transparent Pricing
+              {t('home.pricingTitle')}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
               className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
             >
-              Start free, upgrade when you need more
+              {t('home.pricingSubtitle')}
             </motion.p>
           </motion.div>
 
@@ -387,7 +390,7 @@ export default function Home() {
                 {plan.id === 'pro' && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="px-4 py-1 rounded-full bg-amber-400 text-amber-900 text-sm font-bold">
-                      Most Popular
+                      {t('home.mostPopular')}
                     </span>
                   </div>
                 )}
@@ -405,7 +408,7 @@ export default function Home() {
                           : 'text-gray-500 dark:text-gray-400'
                       }
                     >
-                      /month
+                      {t('home.perMonth')}
                     </span>
                   </div>
 
@@ -424,9 +427,9 @@ export default function Home() {
                         }
                       >
                         {plan.features.dailyConversions === -1
-                          ? 'Unlimited'
+                          ? t('pricing.unlimited')
                           : plan.features.dailyConversions}{' '}
-                        conversions/day
+                        {t('home.conversionsPerDay')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2">
@@ -442,7 +445,7 @@ export default function Home() {
                             : 'text-gray-600 dark:text-gray-400'
                         }
                       >
-                        Up to {plan.features.maxFileSize / (1024 * 1024)}MB files
+                        {t('home.upToMB', { size: plan.features.maxFileSize / (1024 * 1024) })}
                       </span>
                     </li>
                     <li className="flex items-center gap-2">
@@ -458,7 +461,7 @@ export default function Home() {
                             : 'text-gray-600 dark:text-gray-400'
                         }
                       >
-                        Batch: {plan.features.batchSize} files
+                        {t('home.batchFiles', { count: plan.features.batchSize })}
                       </span>
                     </li>
                     <li className="flex items-center gap-2">
@@ -474,7 +477,7 @@ export default function Home() {
                             : 'text-gray-600 dark:text-gray-400'
                         }
                       >
-                        {plan.features.noAds ? 'No ads' : 'Ad supported'}
+                        {plan.features.noAds ? t('home.noAds') : t('home.adSupported')}
                       </span>
                     </li>
                   </ul>
@@ -489,7 +492,7 @@ export default function Home() {
                           : ''
                       }
                     >
-                      {plan.price === 0 ? 'Get Started' : 'Choose Plan'}
+                      {plan.price === 0 ? t('home.getStarted') : t('home.choosePlan')}
                     </Button>
                   </Link>
                 </div>
@@ -513,14 +516,13 @@ export default function Home() {
               variants={fadeInUp}
               className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6"
             >
-              Ready to Convert Safely?
+              {t('home.readyTitle')}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
               className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto"
             >
-              Join thousands of users who trust ConvertSafely for their file conversion needs.
-              No registration required.
+              {t('home.readySubtitle')}
             </motion.p>
             <motion.div
               variants={fadeInUp}
@@ -528,7 +530,7 @@ export default function Home() {
             >
               <Link to="/converter/image">
                 <Button size="lg" className="text-lg px-10 py-4 group">
-                  Start Converting Now
+                  {t('home.startNow')}
                   <FiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>

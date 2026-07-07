@@ -2,20 +2,21 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 
 interface NavItem {
-  label: string;
+  key: string;
   href: string;
   icon?: React.ReactNode;
 }
 
 const navItems: NavItem[] = [
-  { label: 'Image', href: '/converter/image' },
-  { label: 'PDF', href: '/converter/pdf' },
-  { label: 'Audio', href: '/converter/audio' },
-  { label: 'Video', href: '/converter/video' },
-  { label: 'Pricing', href: '/pricing' },
+  { key: 'image', href: '/converter/image' },
+  { key: 'pdf', href: '/converter/pdf' },
+  { key: 'audio', href: '/converter/audio' },
+  { key: 'video', href: '/converter/video' },
+  { key: 'pricing', href: '/pricing' },
 ];
 
 /**
@@ -23,6 +24,7 @@ const navItems: NavItem[] = [
  * Includes dark mode toggle and navigation links
  */
 export function Header() {
+  const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -101,19 +103,19 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={clsx(
-                  'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  isActive(item.href)
-                    ? 'text-primary bg-primary/10'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={clsx(
+                    'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    isActive(item.href)
+                      ? 'text-primary bg-primary/10'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+                  )}
+                >
+                  {t(`nav.${item.key}`)}
+                </Link>
+              ))}
           </nav>
 
           {/* Right Side Actions */}
@@ -122,7 +124,7 @@ export function Header() {
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={isDarkMode ? t('header.lightMode') : t('header.darkMode')}
             >
               {isDarkMode ? (
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -142,7 +144,7 @@ export function Header() {
             {/* Login Button - Desktop */}
             <Link to="/login" className="hidden md:block">
               <Button variant="primary" size="sm">
-                Sign In
+                {t('header.signIn')}
               </Button>
             </Link>
 
@@ -150,7 +152,7 @@ export function Header() {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle mobile menu"
+              aria-label={t('header.menu')}
               aria-expanded={isMobileMenuOpen}
             >
               <motion.div
@@ -205,13 +207,13 @@ export function Header() {
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                   )}
                 >
-                  {item.label}
+                  {t(`nav.${item.key}`)}
                 </Link>
               ))}
               <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-800">
                 <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="primary" fullWidth>
-                    Sign In
+                    {t('header.signIn')}
                   </Button>
                 </Link>
               </div>
