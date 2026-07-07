@@ -24,7 +24,7 @@ const navItems: NavItem[] = [
  * Includes dark mode toggle and navigation links
  */
 export function Header() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -60,6 +60,11 @@ export function Header() {
     } else {
       document.documentElement.classList.remove('dark');
     }
+  };
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'zh' ? 'en' : 'zh';
+    i18n.changeLanguage(newLang);
   };
 
   const isActive = (href: string) => {
@@ -120,6 +125,16 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLanguage}
+              className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium min-w-[36px] flex items-center justify-center"
+              aria-label="Switch language"
+              title={i18n.language === 'zh' ? 'Switch to English' : '切换到中文'}
+            >
+              {i18n.language === 'zh' ? 'EN' : '中'}
+            </button>
+
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDarkMode}

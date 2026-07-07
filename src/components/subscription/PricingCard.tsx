@@ -8,7 +8,7 @@ import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
-import { SUBSCRIPTION_PLANS, getYearlyPrice } from '@/types';
+import { SUBSCRIPTION_PLANS, getYearlyPrice, CURRENCY_CONFIG, getCurrencyForLang } from '@/types';
 import type { SubscriptionPlan } from '@/types';
 import { FiCheck, FiX, FiZap, FiStar, FiBriefcase } from 'react-icons/fi';
 
@@ -39,9 +39,13 @@ export function PricingCard({
   isRecommended = false,
   billingInterval = 'monthly',
 }: PricingCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isFree = plan.price === 0;
   const isYearly = billingInterval === 'yearly';
+  const currency = getCurrencyForLang(i18n.language);
+  const currencySymbol = CURRENCY_CONFIG[currency].symbol;
+  const localMonthlyPrice = plan.pricesByCurrency?.[currency] ?? plan.price;
+  const displayPrice = isYearly ? getYearlyPrice(localMonthlyPrice) : localMonthlyPrice;
 
   // Get icon based on plan
   const PlanIcon = {
@@ -129,7 +133,7 @@ export function PricingCard({
           {/* Price */}
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-bold text-gray-900 dark:text-white">
-              ${isYearly ? getYearlyPrice(plan.price) : plan.price}
+              {currencySymbol}{displayPrice}
             </span>
             {!isFree && (
               <span className="text-gray-500 dark:text-gray-400">
@@ -139,7 +143,7 @@ export function PricingCard({
           </div>
           {isYearly && !isFree && (
             <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-              约 ${(getYearlyPrice(plan.price) / 12).toFixed(2)}{t('pricing.perMonth')}，{t('pricing.save', { percent: 17 })}
+              {currencySymbol}{(getYearlyPrice(localMonthlyPrice) / 12).toFixed(2)}{t('pricing.perMonth')}, {t('pricing.save', { percent: 17 })}
             </p>
           )}
         </CardHeader>

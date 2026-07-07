@@ -23,7 +23,7 @@ import {
   FiServer,
 } from 'react-icons/fi';
 import { Button } from '@/components/ui/Button';
-import { SUBSCRIPTION_PLANS } from '@/types';
+import { SUBSCRIPTION_PLANS, CURRENCY_CONFIG, getCurrencyForLang } from '@/types';
 
 // Animation variants
 const fadeInUp = {
@@ -116,7 +116,7 @@ const trustBadges = [
 ];
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="overflow-hidden">
@@ -399,7 +399,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
                   <div className="flex items-baseline gap-1 mb-4">
                     <span className="text-4xl font-bold">
-                      ${plan.price === 0 ? '0' : plan.price}
+                      {CURRENCY_CONFIG[getCurrencyForLang(i18n.language)].symbol}{plan.pricesByCurrency?.[getCurrencyForLang(i18n.language)] ?? plan.price}
                     </span>
                     <span
                       className={
