@@ -8,7 +8,7 @@ import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { SUBSCRIPTION_PLANS } from '@/types';
+import { SUBSCRIPTION_PLANS, CURRENCY_CONFIG, getCurrencyForLang, getMonthlyPrice } from '@/types';
 import type { SubscriptionPlan } from '@/types';
 import { FiZap, FiLock, FiTrendingUp, FiX } from 'react-icons/fi';
 
@@ -42,7 +42,7 @@ export function UpgradeModal({
   message,
   isLoading = false,
 }: UpgradeModalProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Get upgrade options (plans better than current)
   const upgradePlans = SUBSCRIPTION_PLANS.filter((plan) => {
@@ -139,9 +139,9 @@ export function UpgradeModal({
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      ${plan.price}
+                      {CURRENCY_CONFIG[getCurrencyForLang(i18n.language)].symbol}{getMonthlyPrice(plan.id, getCurrencyForLang(i18n.language))}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">/月</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{t('pricing.perMonth')}</div>
                   </div>
                 </div>
 

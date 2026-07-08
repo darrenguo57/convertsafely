@@ -11,6 +11,16 @@ interface NavItem {
   icon?: React.ReactNode;
 }
 
+const LANGUAGES = [
+  { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'pt', label: 'Português', flag: '🇵🇹' },
+  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
+];
+
 const navItems: NavItem[] = [
   { key: 'image', href: '/converter/image' },
   { key: 'pdf', href: '/converter/pdf' },
@@ -28,6 +38,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const location = useLocation();
 
   // Handle scroll effect
@@ -60,11 +71,6 @@ export function Header() {
     } else {
       document.documentElement.classList.remove('dark');
     }
-  };
-
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'zh' ? 'en' : 'zh';
-    i18n.changeLanguage(newLang);
   };
 
   const isActive = (href: string) => {
@@ -125,15 +131,44 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-            {/* Language Toggle */}
-            <button
-              onClick={toggleLanguage}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium min-w-[36px] flex items-center justify-center"
-              aria-label="Switch language"
-              title={i18n.language === 'zh' ? 'Switch to English' : '切换到中文'}
-            >
-              {i18n.language === 'zh' ? 'EN' : '中'}
-            </button>
+            {/* Language Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium min-w-[36px] flex items-center justify-center gap-1"
+                aria-label="Switch language"
+              >
+                <span>{LANGUAGES.find(l => l.code === (i18n.language?.split('-')[0] ?? 'en'))?.flag ?? '🌐'}</span>
+                <svg className="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isLangMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsLangMenuOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-1">
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          i18n.changeLanguage(lang.code);
+                          setIsLangMenuOpen(false);
+                        }}
+                        className={clsx(
+                          'w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors',
+                          (i18n.language?.split('-')[0] ?? 'en') === lang.code
+                            ? 'bg-primary/10 text-primary font-medium'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        )}
+                      >
+                        <span>{lang.flag}</span>
+                        <span>{lang.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
 
             {/* Dark Mode Toggle */}
             <button

@@ -23,7 +23,7 @@ import {
   FiServer,
 } from 'react-icons/fi';
 import { Button } from '@/components/ui/Button';
-import { SUBSCRIPTION_PLANS, CURRENCY_CONFIG, getCurrencyForLang } from '@/types';
+import { SUBSCRIPTION_PLANS, CURRENCY_CONFIG, getCurrencyForLang, getMonthlyPrice } from '@/types';
 
 // Animation variants
 const fadeInUp = {
@@ -399,7 +399,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
                   <div className="flex items-baseline gap-1 mb-4">
                     <span className="text-4xl font-bold">
-                      {CURRENCY_CONFIG[getCurrencyForLang(i18n.language)].symbol}{plan.pricesByCurrency?.[getCurrencyForLang(i18n.language)] ?? plan.price}
+                      {CURRENCY_CONFIG[getCurrencyForLang(i18n.language)].symbol}{getMonthlyPrice(plan.id, getCurrencyForLang(i18n.language))}
                     </span>
                     <span
                       className={
@@ -492,7 +492,7 @@ export default function Home() {
                           : ''
                       }
                     >
-                      {plan.price === 0 ? t('home.getStarted') : t('home.choosePlan')}
+                      {plan.id === 'free' ? t('home.getStarted') : t('home.choosePlan')}
                     </Button>
                   </Link>
                 </div>

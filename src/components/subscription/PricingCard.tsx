@@ -8,7 +8,7 @@ import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
-import { SUBSCRIPTION_PLANS, getYearlyPrice, CURRENCY_CONFIG, getCurrencyForLang } from '@/types';
+import { getMonthlyPrice, getYearlyPrice, getYearlyMonthlyEquiv, getYearlySavingsPercent, CURRENCY_CONFIG, getCurrencyForLang } from '@/types';
 import type { SubscriptionPlan } from '@/types';
 import { FiCheck, FiX, FiZap, FiStar, FiBriefcase } from 'react-icons/fi';
 
@@ -40,12 +40,15 @@ export function PricingCard({
   billingInterval = 'monthly',
 }: PricingCardProps) {
   const { t, i18n } = useTranslation();
-  const isFree = plan.price === 0;
+  const isFree = plan.id === 'free';
   const isYearly = billingInterval === 'yearly';
   const currency = getCurrencyForLang(i18n.language);
   const currencySymbol = CURRENCY_CONFIG[currency].symbol;
-  const localMonthlyPrice = plan.pricesByCurrency?.[currency] ?? plan.price;
-  const displayPrice = isYearly ? getYearlyPrice(localMonthlyPrice) : localMonthlyPrice;
+  const monthlyPrice = getMonthlyPrice(plan.id, currency);
+  const yearlyPrice = getYearlyPrice(plan.id, currency);
+  const displayPrice = isYearly ? yearlyPrice : monthlyPrice;
+  const monthlyEquiv = getYearlyMonthlyEquiv(plan.id, currency);
+  const savingsPercent = getYearlySavingsPercent(plan.id, currency);
 
   // Get icon based on plan
   const PlanIcon = {
@@ -143,7 +146,7 @@ export function PricingCard({
           </div>
           {isYearly && !isFree && (
             <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-              {currencySymbol}{(getYearlyPrice(localMonthlyPrice) / 12).toFixed(2)}{t('pricing.perMonth')}, {t('pricing.save', { percent: 17 })}
+              {currencySymbol}{monthlyEquiv}{t('pricing.perMonth')}, {t('pricing.save', { percent: savingsPercent })}
             </p>
           )}
         </CardHeader>

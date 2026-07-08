@@ -79,7 +79,7 @@ export default function Pricing() {
     trackSubscriptionFunnel('select', plan.id);
 
     // Free plan - just update
-    if (plan.price === 0) {
+    if (plan.id === 'free') {
       setPlan(plan);
       toast.success(t('pricing.switchSuccess'));
       return;
@@ -97,7 +97,7 @@ export default function Pricing() {
   };
 
   const startCheckout = async (plan: SubscriptionPlan) => {
-    if (plan.price === 0) return;
+    if (plan.id === 'free') return;
 
     setIsLoading(true);
     try {

@@ -33,7 +33,7 @@ import { UpgradeModal } from '@/components/subscription/UpgradeModal';
 import { AdSidebar } from '@/components/ads/AdSidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
-import { SUBSCRIPTION_PLANS, CURRENCY_CONFIG, getCurrencyForLang } from '@/types';
+import { SUBSCRIPTION_PLANS, CURRENCY_CONFIG, getCurrencyForLang, getMonthlyPrice } from '@/types';
 import { createBillingPortalSession, cancelSubscription, reactivateSubscription } from '@/services/stripe';
 import { trackEvent } from '@/services/analytics';
 import type { SubscriptionPlan } from '@/types';
@@ -406,9 +406,9 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right">
                         <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                          {CURRENCY_CONFIG[getCurrencyForLang(i18n.language)].symbol}{plan.pricesByCurrency?.[getCurrencyForLang(i18n.language)] ?? plan.price}
+                          {CURRENCY_CONFIG[getCurrencyForLang(i18n.language)].symbol}{getMonthlyPrice(plan.id, getCurrencyForLang(i18n.language))}
                         </p>
-                        {plan.price > 0 && (
+                        {plan.id !== 'free' && (
                           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.perMonth')}</p>
                         )}
                       </div>
