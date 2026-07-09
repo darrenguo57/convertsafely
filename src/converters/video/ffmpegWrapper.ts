@@ -76,7 +76,7 @@ class FFmpegManager {
       this.loadingState = 'loading';
       const ffmpeg = this.getInstance();
 
-      const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+      const baseURL = `${import.meta.env.BASE_URL}ffmpeg`;
       
       await ffmpeg.load({
         coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),

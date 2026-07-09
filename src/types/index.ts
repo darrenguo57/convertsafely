@@ -114,12 +114,12 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
  */
 export const PRICING_TABLE: Record<string, PlanPricing> = {
   pro: {
-    monthly: { USD: 5.99, CNY: 29.99, EUR: 5.99, GBP: 4.99, BRL: 19.99, SAR: 22.99, AED: 21.99, MXN: 99.99, ARS: 4999.99 },
-    yearly:  { USD: 49.99, CNY: 288.00, EUR: 49.99, GBP: 39.99, BRL: 159.99, SAR: 199.99, AED: 179.99, MXN: 799.99, ARS: 39999.99 },
+    monthly: { USD: 5.99, CNY: 19.99, EUR: 5.99, GBP: 4.99, BRL: 14.99, SAR: 22.99, AED: 21.99, MXN: 99.99, ARS: 4999.99 },
+    yearly:  { USD: 49.99, CNY: 199.00, EUR: 49.99, GBP: 39.99, BRL: 129.99, SAR: 199.99, AED: 179.99, MXN: 799.99, ARS: 39999.99 },
   },
   enterprise: {
-    monthly: { USD: 12.99, CNY: 69.99, EUR: 12.99, GBP: 10.99, BRL: 39.99, SAR: 49.99, AED: 44.99, MXN: 199.99, ARS: 9999.99 },
-    yearly:  { USD: 99.99, CNY: 688.00, EUR: 99.99, GBP: 89.99, BRL: 339.99, SAR: 449.99, AED: 399.99, MXN: 1599.99, ARS: 79999.99 },
+    monthly: { USD: 12.99, CNY: 49.99, EUR: 12.99, GBP: 10.99, BRL: 29.99, SAR: 49.99, AED: 44.99, MXN: 199.99, ARS: 9999.99 },
+    yearly:  { USD: 99.99, CNY: 499.00, EUR: 99.99, GBP: 89.99, BRL: 259.99, SAR: 449.99, AED: 399.99, MXN: 1599.99, ARS: 79999.99 },
   },
   free: {
     monthly: { USD: 0, CNY: 0, EUR: 0, GBP: 0, BRL: 0, SAR: 0, AED: 0, MXN: 0, ARS: 0 },
