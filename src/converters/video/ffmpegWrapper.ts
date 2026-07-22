@@ -4,7 +4,7 @@
  */
 
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
+import { toBlobURL, fetchFile } from '@ffmpeg/util';
 import { CONVERSION_TIMEOUTS, ERROR_MESSAGES } from '@/utils/constants';
 
 /**
@@ -75,20 +75,31 @@ class FFmpegManager {
       this.loadingState = 'loading';
       const ffmpeg = this.getInstance();
 
-      // 优先从本地加载，失败则回退到 CDN
+      // 优先从本地 ESM 文件加载，失败则回退到 CDN
       const baseURL = `${import.meta.env.BASE_URL}ffmpeg`;
-      const coreURL = `${baseURL}/ffmpeg-core.js`;
-      const wasmURL = `${baseURL}/ffmpeg-core.wasm`;
 
       try {
-        await ffmpeg.load({ coreURL, wasmURL });
+        const coreBlobURL = await toBlobURL(
+          `${baseURL}/ffmpeg-core.js`,
+          'text/javascript'
+        );
+        const wasmBlobURL = await toBlobURL(
+          `${baseURL}/ffmpeg-core.wasm`,
+          'application/wasm'
+        );
+        await ffmpeg.load({ coreURL: coreBlobURL, wasmURL: wasmBlobURL });
       } catch (localError) {
         console.warn('FFmpeg local load failed, trying CDN fallback:', localError);
-        const cdnBase = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
-        await ffmpeg.load({
-          coreURL: `${cdnBase}/ffmpeg-core.js`,
-          wasmURL: `${cdnBase}/ffmpeg-core.wasm`,
-        });
+        const cdnBase = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+        const coreBlobURL = await toBlobURL(
+          `${cdnBase}/ffmpeg-core.js`,
+          'text/javascript'
+        );
+        const wasmBlobURL = await toBlobURL(
+          `${cdnBase}/ffmpeg-core.wasm`,
+          'application/wasm'
+        );
+        await ffmpeg.load({ coreURL: coreBlobURL, wasmURL: wasmBlobURL });
       }
 
       this.loadingState = 'ready';
