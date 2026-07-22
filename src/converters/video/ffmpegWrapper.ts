@@ -4,8 +4,7 @@
  */
 
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { toBlobURL, fetchFile } from '@ffmpeg/util';
+import { fetchFile } from '@ffmpeg/util';
 import { CONVERSION_TIMEOUTS, ERROR_MESSAGES } from '@/utils/constants';
 
 /**
@@ -76,18 +75,29 @@ class FFmpegManager {
       this.loadingState = 'loading';
       const ffmpeg = this.getInstance();
 
+      // 优先从本地加载，失败则回退到 CDN
       const baseURL = `${import.meta.env.BASE_URL}ffmpeg`;
-      
-      await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-      });
+      const coreURL = `${baseURL}/ffmpeg-core.js`;
+      const wasmURL = `${baseURL}/ffmpeg-core.wasm`;
+
+      try {
+        await ffmpeg.load({ coreURL, wasmURL });
+      } catch (localError) {
+        console.warn('FFmpeg local load failed, trying CDN fallback:', localError);
+        const cdnBase = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+        await ffmpeg.load({
+          coreURL: `${cdnBase}/ffmpeg-core.js`,
+          wasmURL: `${cdnBase}/ffmpeg-core.wasm`,
+        });
+      }
 
       this.loadingState = 'ready';
     } catch (error) {
       this.loadingState = 'error';
       this.loadPromise = null;
-      throw new Error('Failed to load FFmpeg: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error('FFmpeg load error:', error);
+      const msg = error instanceof Error ? error.message : String(error);
+      throw new Error('Failed to load FFmpeg: ' + msg);
     }
   }
 
