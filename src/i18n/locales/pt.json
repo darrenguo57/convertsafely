@@ -8,6 +8,8 @@
   },
   "header": {
     "signIn": "Entrar",
+    "signOut": "Sair",
+    "dashboard": "Painel",
     "darkMode": "Mudar para o modo escuro",
     "lightMode": "Mudar para o modo claro",
     "menu": "Alternar menu mobile"

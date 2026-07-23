@@ -8,6 +8,8 @@
   },
   "header": {
     "signIn": "登录",
+    "signOut": "退出登录",
+    "dashboard": "控制台",
     "darkMode": "切换到深色模式",
     "lightMode": "切换到浅色模式",
     "menu": "切换移动端菜单"

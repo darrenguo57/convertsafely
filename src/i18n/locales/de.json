@@ -8,6 +8,8 @@
   },
   "header": {
     "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "dashboard": "Dashboard",
     "darkMode": "Zum dunklen Modus wechseln",
     "lightMode": "Zum hellen Modus wechseln",
     "menu": "Mobilmenü umschalten"

@@ -8,6 +8,8 @@
   },
   "header": {
     "signIn": "Connexion",
+    "signOut": "Déconnexion",
+    "dashboard": "Tableau de bord",
     "darkMode": "Passer en mode sombre",
     "lightMode": "Passer en mode clair",
     "menu": "Basculer le menu mobile"

@@ -8,6 +8,8 @@
   },
   "header": {
     "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "dashboard": "Dashboard",
     "darkMode": "Switch to dark mode",
     "lightMode": "Switch to light mode",
     "menu": "Toggle mobile menu"

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
 
 interface NavItem {
   key: string;
@@ -35,10 +36,13 @@ const navItems: NavItem[] = [
  */
 export function Header() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
 
   // Handle scroll effect
@@ -77,6 +81,24 @@ export function Header() {
     if (href === '/') return location.pathname === '/';
     return location.pathname.startsWith(href);
   };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
+  const handleDashboardClick = () => {
+    navigate('/dashboard');
+    setIsUserMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setIsUserMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    navigate('/');
+  };
+
+  const userInitial = user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U';
 
   return (
     <header
@@ -191,12 +213,56 @@ export function Header() {
               )}
             </button>
 
-            {/* Login Button - Desktop */}
-            <Link to="/login" className="hidden md:block">
-              <Button variant="primary" size="sm">
-                {t('header.signIn')}
-              </Button>
-            </Link>
+            {/* Auth Area - Desktop */}
+            {isAuthenticated ? (
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 p-1 pr-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  {user?.photoURL ? (
+                    <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-medium">
+                      {userInitial}
+                    </div>
+                  )}
+                  <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isUserMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-1">
+                      <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {user?.displayName || user?.email}
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleDashboardClick}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {t('header.dashboard')}
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {t('header.signOut')}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="hidden md:block">
+                <Button variant="primary" size="sm" onClick={handleLoginClick}>
+                  {t('header.signIn')}
+                </Button>
+              </div>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -261,11 +327,33 @@ export function Header() {
                 </Link>
               ))}
               <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-800">
-                <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" fullWidth>
+                {isAuthenticated ? (
+                  <div className="space-y-1">
+                    <div className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 truncate">
+                      {user?.displayName || user?.email}
+                    </div>
+                    <button
+                      onClick={() => { navigate('/dashboard'); setIsMobileMenuOpen(false); }}
+                      className="block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      {t('header.dashboard')}
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      {t('header.signOut')}
+                    </button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="primary"
+                    fullWidth
+                    onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }}
+                  >
                     {t('header.signIn')}
                   </Button>
-                </Link>
+                )}
               </div>
             </nav>
           </motion.div>

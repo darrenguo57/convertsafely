@@ -64,6 +64,7 @@ export async function createCheckoutSession(
   customerEmail?: string
 ): Promise<{ sessionId: string; url: string } | null> {
   const priceId = PRICE_IDS[plan];
+  const baseUrl = `${window.location.origin}${import.meta.env.BASE_URL}`;
 
   // Mock implementation for development
   // In production, this should make an API call to your backend
@@ -72,7 +73,7 @@ export async function createCheckoutSession(
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return {
       sessionId: 'mock_session_' + Date.now(),
-      url: `${window.location.origin}/pricing?success=true&plan=${plan}`,
+      url: `${baseUrl}pricing?success=true&plan=${plan}`,
     };
   }
 
@@ -86,8 +87,8 @@ export async function createCheckoutSession(
       body: JSON.stringify({
         priceId,
         customerEmail,
-        successUrl: `${window.location.origin}/dashboard?success=true`,
-        cancelUrl: `${window.location.origin}/pricing?canceled=true`,
+        successUrl: `${baseUrl}dashboard?success=true`,
+        cancelUrl: `${baseUrl}pricing?canceled=true`,
       }),
     });
 
@@ -128,7 +129,7 @@ export async function createBillingPortalSession(
 ): Promise<{ url: string } | null> {
   if (!STRIPE_PUBLISHABLE_KEY) {
     console.log('Mock billing portal for customer:', customerId);
-    return { url: `${window.location.origin}/dashboard` };
+    return { url: `${window.location.origin}${import.meta.env.BASE_URL}dashboard` };
   }
 
   try {

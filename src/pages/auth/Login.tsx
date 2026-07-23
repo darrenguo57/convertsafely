@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { useAuth } from '@/hooks/useAuth';
-import { signInWithGoogle } from '@/services/firebase';
 import { trackEvent } from '@/services/analytics';
 
 /**
@@ -34,12 +33,12 @@ export default function Login() {
 
   const redirectTo = searchParams.get('redirect') || '/';
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (wait for auth to finish loading)
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!authLoading && isAuthenticated) {
       navigate(redirectTo);
     }
-  }, [isAuthenticated, navigate, redirectTo]);
+  }, [isAuthenticated, authLoading, navigate, redirectTo]);
 
   // Handle auth errors
   useEffect(() => {
@@ -73,18 +72,6 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      // Try Firebase Google sign-in first
-      try {
-        await signInWithGoogle();
-        trackEvent('login', { method: 'google' });
-        toast.success(t('auth.googleSuccess'));
-        navigate(redirectTo);
-        return;
-      } catch (firebaseError) {
-        // Fall back to mock Google sign-in
-        console.log('Firebase sign-in failed, using mock:', firebaseError);
-      }
-
       await loginWithGoogle();
       trackEvent('login', { method: 'google' });
       toast.success(t('auth.googleSuccess'));
